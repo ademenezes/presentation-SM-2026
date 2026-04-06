@@ -1,0 +1,323 @@
+---
+format:
+  revealjs:
+    theme: [default, styles.css]
+    title-slide: false
+    transition: fade
+    transition-speed: slow
+    slide-number: false
+    controls: true
+    progress: false
+    width: 1920
+    height: 1080
+    margin: 0.04
+    center: false
+    hash: true
+    history: true
+    embed-resources: false
+    include-in-header:
+      text: |
+        <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+        <script src="https://cdn.jsdelivr.net/npm/plotly.js@2/dist/plotly.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flubber@0.4.2/build/flubber.min.js"></script>
+---
+
+## {#title-custom .title-slide data-background-color="#f7f8fa"}
+
+```{=html}
+<div class="divider" style="width:80px; height:5px; margin-bottom:1.2em;"></div>
+<h1 style="font-size:3.5em; font-weight:900; letter-spacing:-0.03em; color:#0071bc; margin-bottom: 0.2em;">Water Services<br>in Transition</h1>
+<div style="font-size:1.6em; color:#4a5568; font-weight:300; margin-top:0.5em;">From Crisis to Smart Investment</div>
+<div style="font-size:1em; color:#8898aa; margin-top:2em;">World Bank Water Global Practice</div>
+<div style="font-size:0.85em; color:#8898aa; margin-top:0.5em;">Spring Meetings 2026</div>
+```
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 2: TRIPLE BURDEN — WATER (map → chart morph)
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#triple-burden-water}
+
+### The Triple Burden — Water
+
+Billions face overlapping **poverty**, **flood risk**, and **inadequate access** — often all at once.
+
+```{=html}
+<div id="tb-morph-water" style="width:100%; height:78vh; position:relative;"></div>
+<p class="fragment" data-fragment-index="0" style="display:none;">trigger</p>
+```
+
+::: {.source}
+Source: World Bank Triple Burden Analysis (2025) &nbsp;|&nbsp; ADM2-level, 130+ countries
+:::
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 3: TRIPLE BURDEN — SANITATION (map → chart morph)
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#triple-burden-sanitation}
+
+### The Triple Burden — Sanitation
+
+**49% of Sub-Saharan Africa** faces all three burdens — poverty, flood risk, and inadequate sanitation.
+
+```{=html}
+<div id="tb-morph-sanitation" style="width:100%; height:78vh; position:relative;"></div>
+<p class="fragment" data-fragment-index="0" style="display:none;">trigger</p>
+```
+
+::: {.source}
+Source: World Bank Triple Burden Analysis (2025) &nbsp;|&nbsp; ADM2-level, 130+ countries
+:::
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 3b: TRIPLE BURDEN — INCOME GROUPS
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#triple-burden-income}
+
+### The Triple Burden by Income Group
+
+The poorest countries carry the heaviest weight — **37% of LIC populations** face all three burdens.
+
+```{=html}
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:40px; height:68vh;">
+  <div>
+    <div style="text-align:center; font-weight:600; color:var(--text-secondary); font-size:1.1em; margin-bottom:8px;">Water</div>
+    <div id="tb-income-water" class="chart-container" style="height:58vh;"></div>
+  </div>
+  <div>
+    <div style="text-align:center; font-weight:600; color:var(--text-secondary); font-size:1.1em; margin-bottom:8px;">Sanitation</div>
+    <div id="tb-income-sanitation" class="chart-container" style="height:58vh;"></div>
+  </div>
+</div>
+```
+
+::: {.source}
+Source: World Bank Triple Burden Analysis (2025)
+:::
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 4: SPENDING TREND
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#spending-trend}
+
+### Spending Is Rising
+
+The good news: global water sector spending has been increasing.
+
+::: {.chart-full}
+<div style="display:flex; justify-content:center; align-items:center; height:100%; color: var(--text-muted); font-size:1.5em; background: var(--bg-secondary); border-radius: 12px;">
+World Sector Spending Trend<br>
+<span style="font-size:0.6em;">(Chart to be extracted from FWSF dashboard)</span>
+</div>
+:::
+
+::: {.source}
+Source: Funding a Water-Secure Future (fwsf.wbwaterdata.org)
+:::
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 5: SPENDING GAP
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#spending-gap}
+
+### ...But Not Fast Enough
+
+The gap between what we spend and what's needed remains enormous.
+
+::: {.chart-full}
+<div style="display:flex; justify-content:center; align-items:center; height:100%; color: var(--text-muted); font-size:1.5em; background: var(--bg-secondary); border-radius: 12px;">
+Spending Gap Visualization<br>
+<span style="font-size:0.6em;">(Chart to be extracted from FWSF dashboard)</span>
+</div>
+:::
+
+::: {.source}
+Source: Funding a Water-Secure Future (fwsf.wbwaterdata.org)
+:::
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 6: COVERAGE MAP
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#coverage data-background-color="#f7f8fa"}
+
+### Unprecedented Data Coverage
+
+```{=html}
+<p style="color: var(--text-secondary); font-size: 1.05em; margin-bottom: 24px;">For the first time, we can see how utilities perform across the developing world — regulatory data from <strong>32 countries</strong>.</p>
+
+<div class="metric-row">
+  <div class="metric-card">
+    <span class="metric-value" data-counter="33509">0</span>
+    <span class="metric-label">Utilities</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-value" data-counter="32" data-suffix="+">0</span>
+    <span class="metric-label">Countries</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-value" data-counter="3" data-suffix="M+">0</span>
+    <span class="metric-label">Observations</span>
+  </div>
+</div>
+<div id="coverage-map" class="chart-container" style="height: 550px; width: 100%;"></div>
+```
+
+::: {.source}
+Source: IBNET, Regulators Performance Database, World Bank
+:::
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 7: TARIFFS — Hero Chart State 1
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#tariffs data-background-color="#ffffff"}
+
+```{=html}
+<div id="hero-chart-tariffs" class="hero-chart-container chart-full"></div>
+```
+
+::: {.source}
+Source: IBNET Tariff Portal, constant 2025 USD
+:::
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 8: NRW — Hero Chart State 2
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#nrw data-background-color="#ffffff"}
+
+```{=html}
+<div id="hero-chart-nrw" class="hero-chart-container chart-full"></div>
+```
+
+::: {.source}
+Source: Regulators Performance Database, IBNET
+:::
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 9: METERING — Hero Chart State 3
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#metering data-background-color="#ffffff"}
+
+```{=html}
+<div id="hero-chart-metering" class="hero-chart-container chart-full"></div>
+```
+
+::: {.source}
+Source: Regulators Performance Database, IBNET
+:::
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 10: COST COVERAGE — Hero Chart State 4
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#cost-coverage data-background-color="#ffffff"}
+
+```{=html}
+<div id="hero-chart-cost-coverage" class="hero-chart-container chart-full"></div>
+```
+
+::: {.source}
+Source: Regulators Performance Database, IBNET
+:::
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 11: THE PARADOX — Tariffs Up, But NRW Worsening
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#paradox data-background-color="#ffffff"}
+
+```{=html}
+<div id="hero-chart-paradox" class="hero-chart-container chart-full"></div>
+```
+
+::: {.source}
+Source: IBNET Tariff Portal, Regulators Performance Database
+:::
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 12: CONTINENTAL DRYING — LAND USE
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#land-use-tws}
+
+### The Water-Energy-Land Nexus
+
+Deforestation and agricultural expansion are draining freshwater reserves.
+
+```{=html}
+<div id="chart-land-use-tws" class="chart-container" style="height: 65vh;"></div>
+```
+
+::: {.source}
+Source: Continental Drying — A Threat to Our Common Future, World Bank
+:::
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 13: CONTINENTAL DRYING — ENERGY
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#energy-tws}
+
+### As Water Becomes Scarcer, Energy Costs Rise
+
+A vicious cycle that policy can break.
+
+```{=html}
+<div id="chart-energy-tws" class="chart-container" style="height: 65vh;"></div>
+```
+
+::: {.source}
+Source: Continental Drying — A Threat to Our Common Future, World Bank
+:::
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 14: CALL TO ACTION
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#call-to-action data-background-color="#f7f8fa"}
+
+### Where Investment Pays Off
+
+```{=html}
+<div class="divider"></div>
+<ul class="policy-points">
+  <li><span class="highlight">Target the triple burden</span> — prioritize the 1.2 billion people facing overlapping poverty, flood risk, and inadequate access.</li>
+  <li><span class="highlight">Metering</span> — you can't manage what you don't measure. Expanding meters reduces NRW and improves billing.</li>
+  <li><span class="highlight">Tariff reform</span> — real tariffs must keep pace with costs. Transparent, affordable pricing builds public trust.</li>
+  <li><span class="highlight">NRW reduction</span> — every litre saved is a litre that doesn't need to be produced, treated, and pumped.</li>
+  <li><span class="highlight">Data-driven regulation</span> — with 33,000+ utilities in the evidence base, we now know <em>where</em> to invest and <em>what works</em>.</li>
+</ul>
+```
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCRIPTS (loaded at end for performance)
+     ═══════════════════════════════════════════════════════════ -->
+
+<script src="scripts/main.js"></script>
+<script src="scripts/hero-chart.js"></script>
+<script src="scripts/coverage-map.js"></script>
+<script src="scripts/three-d-chart.js"></script>
+<script src="scripts/tb-chart.js"></script>

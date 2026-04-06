@@ -1,0 +1,506 @@
+/*-- scss:defaults --*/
+
+/*-- scss:rules --*/
+/* ══════════════════════════════════════════════════════════════
+   CLEAN LIGHT THEME — Professional Policy Presentation
+   Inspired by clash-to-crash dashboard & WB publications
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Design tokens ──────────────────────────────────────────── */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7f8fa;
+  --bg-card: #f0f2f5;
+  --bg-accent: #eef5fa;
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a5568;
+  --text-muted: #8898aa;
+  --accent-blue: #0071bc;
+  --accent-blue-light: #4da3d4;
+  --accent-orange: #e8553a;
+  --accent-green: #2b9f93;
+  --accent-purple: #6c4fa0;
+  --accent-yellow: #d4a017;
+  --accent-pink: #c7365f;
+  --border-light: rgba(0, 0, 0, 0.08);
+  --grid-color: rgba(0, 0, 0, 0.07);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  /* Region colors — optimized for light backgrounds */
+  --color-ssa: #e8553a;
+  --color-eap: #0071bc;
+  --color-eca: #6c4fa0;
+  --color-lac: #2b9f93;
+  --color-menap: #d4a017;
+  --color-sar: #c7365f;
+}
+
+/* ── System font stack (OWID-style) — no external imports ─── */
+
+/* ── Reveal.js overrides ────────────────────────────────────── */
+.reveal {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--text-primary);
+}
+
+.reveal .slides {
+  text-align: left;
+}
+
+.reveal .slides section {
+  background: var(--bg-primary);
+  padding: 40px 60px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.reveal .slide-background {
+  background: var(--bg-primary);
+}
+
+/* ── Typography ─────────────────────────────────────────────── */
+.reveal h1 {
+  font-size: 3.2em;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--text-primary);
+  margin-bottom: 0.3em;
+}
+
+.reveal h2 {
+  font-size: 2.2em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--text-primary);
+  margin-bottom: 0.4em;
+}
+
+.reveal h3 {
+  font-size: 1.4em;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: -0.01em;
+  margin-bottom: 0.6em;
+}
+
+.reveal p {
+  font-size: 1.1em;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  max-width: 80%;
+}
+
+/* ── Title slide ────────────────────────────────────────────── */
+.title-slide {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  background: linear-gradient(135deg, #f7f8fa 0%, #eef5fa 50%, #e8f0f8 100%) !important;
+}
+
+.title-slide h1 {
+  font-size: 4em;
+  color: var(--accent-blue);
+}
+
+.title-slide .subtitle {
+  font-size: 1.6em;
+  color: var(--text-secondary);
+  font-weight: 300;
+  margin-top: 0.5em;
+}
+
+.title-slide .author {
+  font-size: 1em;
+  color: var(--text-muted);
+  margin-top: 2em;
+  font-weight: 400;
+}
+
+/* ── Insight box — key takeaway per slide ─────────────────── */
+.insight-box {
+  background: var(--bg-accent);
+  border-left: 4px solid var(--accent-blue);
+  padding: 16px 24px;
+  border-radius: 0 8px 8px 0;
+  margin: 16px 0;
+  max-width: 70%;
+}
+
+.insight-box p {
+  color: var(--text-primary);
+  font-size: 1.05em;
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.insight-box .insight-number {
+  font-size: 2em;
+  font-weight: 900;
+  color: var(--accent-blue);
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ── Big number callout ─────────────────────────────────────── */
+.big-number {
+  font-size: 6em;
+  font-weight: 900;
+  color: var(--accent-blue);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.big-number-label {
+  font-size: 1.3em;
+  color: var(--text-secondary);
+  font-weight: 300;
+  margin-top: 0.3em;
+}
+
+/* ── Chart containers ───────────────────────────────────────── */
+.chart-container {
+  width: 100%;
+  height: 70vh;
+  position: relative;
+  margin-top: 20px;
+}
+
+.chart-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-full {
+  width: 100%;
+  height: 85vh;
+  position: relative;
+}
+
+.hero-chart-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.hero-chart-container svg {
+  overflow: visible;
+}
+
+/* ── Scene headline (annotation style) ──────────────────────── */
+.scene-headline {
+  position: absolute;
+  top: 30px;
+  left: 60px;
+  z-index: 10;
+}
+
+.scene-headline h2 {
+  margin: 0;
+  font-size: 1.8em;
+}
+
+.scene-headline p {
+  margin: 0.3em 0 0 0;
+  font-size: 1em;
+  color: var(--text-secondary);
+  max-width: 600px;
+}
+
+/* ── Callout annotation ─────────────────────────────────────── */
+.callout {
+  position: absolute;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.95);
+  border-left: 3px solid var(--accent-blue);
+  border-radius: 0 6px 6px 0;
+  box-shadow: var(--shadow-md);
+  font-size: 0.9em;
+  color: var(--text-primary);
+  max-width: 300px;
+  z-index: 20;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.callout.visible {
+  opacity: 1;
+}
+
+/* ── Map styles ─────────────────────────────────────────────── */
+.map-container {
+  width: 100%;
+  height: 80vh;
+  position: relative;
+}
+
+/* ── Legend ──────────────────────────────────────────────────── */
+.legend {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85em;
+  color: var(--text-secondary);
+}
+
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+/* ── Reference line (e.g., 100% breakeven) ──────────────────── */
+.reference-line {
+  stroke: var(--accent-orange);
+  stroke-width: 2;
+  stroke-dasharray: 8, 4;
+  opacity: 0.7;
+}
+
+.reference-label {
+  fill: var(--accent-orange);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ── D3 chart typography (Economist/OWID style) ────────────── */
+.axis text {
+  fill: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: 13px;
+}
+
+.axis .domain {
+  display: none;
+}
+
+.axis line {
+  stroke: var(--grid-color);
+}
+
+.axis-label {
+  fill: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.chart-title {
+  fill: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.chart-subtitle {
+  fill: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+/* ── Animated counter ───────────────────────────────────────── */
+.stat-counter {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 40px;
+}
+
+.stat-value {
+  font-size: 4em;
+  font-weight: 900;
+  color: var(--accent-blue);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 1em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+}
+
+/* ── Key metric cards (for coverage slide) ────────────────── */
+.metric-row {
+  display: flex;
+  gap: 40px;
+  margin: 20px 0;
+}
+
+.metric-card {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 24px 32px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+}
+
+.metric-card .metric-value {
+  font-size: 3.2em;
+  font-weight: 900;
+  color: var(--accent-blue);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.metric-card .metric-label {
+  font-size: 0.9em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* ── Policy points (call to action) ─────────────────────────── */
+.policy-points {
+  list-style: none;
+  padding: 0;
+  margin: 2em 0;
+}
+
+.policy-points li {
+  font-size: 1.3em;
+  color: var(--text-primary);
+  padding: 0.8em 1em;
+  margin-bottom: 0.5em;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  border-left: 4px solid var(--accent-blue);
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.5s ease;
+  line-height: 1.5;
+}
+
+.policy-points li.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.policy-points li .highlight {
+  color: var(--accent-blue);
+  font-weight: 700;
+}
+
+/* ── Plotly chart overrides ────────────────────────────────── */
+.js-plotly-plot .plotly .modebar {
+  right: 20px !important;
+  top: 10px !important;
+}
+
+.js-plotly-plot .plotly .modebar-btn {
+  color: var(--text-muted) !important;
+}
+
+/* ── Fragment animations ────────────────────────────────────── */
+.reveal .fragment.fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease;
+}
+
+.reveal .fragment.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Source citation ────────────────────────────────────────── */
+.source {
+  position: absolute;
+  bottom: 20px;
+  left: 60px;
+  font-size: 0.65em;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Image slides (triple burden, continental drying) ────────── */
+.image-slide {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.image-slide img {
+  max-width: 90%;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+}
+
+/* ── Two-column layout ──────────────────────────────────────── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.two-col-40-60 {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 40px;
+  align-items: start;
+}
+
+/* ── Annotation arrow (for chart callouts) ───────────────── */
+.chart-annotation {
+  font-family: var(--font-display);
+  font-size: 13px;
+  fill: var(--text-secondary);
+}
+
+.chart-annotation-bold {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  fill: var(--text-primary);
+}
+
+/* ── Data note (transparency about data limitations) ────── */
+.data-note {
+  font-size: 0.75em;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 8px 14px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+/* ── Divider line ────────────────────────────────────────── */
+.divider {
+  width: 60px;
+  height: 4px;
+  background: var(--accent-blue);
+  border-radius: 2px;
+  margin: 16px 0;
+}
+
+/* ── Responsive adjustments ─────────────────────────────────── */
+@media (max-width: 1400px) {
+  .reveal h1 { font-size: 2.6em; }
+  .reveal h2 { font-size: 1.8em; }
+  .big-number { font-size: 4em; }
+}
