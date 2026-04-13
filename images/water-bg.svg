@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <radialGradient id="glow1" cx="30%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#2e6da4" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#1a3a5c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="75%" cy="65%" r="50%">
+      <stop offset="0%" stop-color="#6699cc" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#1a3a5c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="wave1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2e6da4" stop-opacity="0.06"/>
+      <stop offset="50%" stop-color="#6699cc" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#1a3a5c" stop-opacity="0.08"/>
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="#1a3a5c"/>
+  <rect width="1920" height="1080" fill="url(#glow1)"/>
+  <rect width="1920" height="1080" fill="url(#glow2)"/>
+  <!-- Subtle wave forms -->
+  <path d="M0 700 Q 320 650, 640 700 T 1280 700 T 1920 700 L1920 1080 L0 1080Z" fill="url(#wave1)"/>
+  <path d="M0 780 Q 480 730, 960 780 T 1920 780 L1920 1080 L0 1080Z" fill="#2e6da4" fill-opacity="0.04"/>
+  <path d="M0 850 Q 400 810, 800 850 T 1600 850 T 1920 870 L1920 1080 L0 1080Z" fill="#6699cc" fill-opacity="0.03"/>
+  <!-- Water droplet silhouettes -->
+  <g opacity="0.03">
+    <path d="M300 200 C300 200 260 260 260 290 C260 312 278 330 300 330 C322 330 340 312 340 290 C340 260 300 200 300 200Z" fill="#c8d8e4"/>
+    <path d="M1600 350 C1600 350 1570 395 1570 415 C1570 432 1583 445 1600 445 C1617 445 1630 432 1630 415 C1630 395 1600 350 1600 350Z" fill="#c8d8e4"/>
+    <path d="M900 100 C900 100 875 140 875 155 C875 169 886 180 900 180 C914 180 925 169 925 155 C925 140 900 100 900 100Z" fill="#c8d8e4"/>
+  </g>
+</svg>

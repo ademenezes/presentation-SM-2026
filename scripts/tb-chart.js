@@ -1,325 +1,463 @@
 /**
- * Triple Burden — D3 map-to-chart morph using flubber
- *
- * On slide entry: renders a choropleth map colored by dominant burden.
- * On fragment advance (arrow/click): each country shape morphs into
- * its target rectangle in a horizontal stacked bar chart.
+ * Triple Burden — D3 ADM2 choropleth maps + regional bar charts (separate slides)
+ * Maps render dissolved ADM2 polygons with interactive region cards.
+ * Bar charts show regional burden breakdowns.
  */
 
 (function () {
   "use strict";
 
-  const FONT = "-apple-system, BlinkMacSystemFont, sans-serif";
+  const FONT = "Nunito, -apple-system, BlinkMacSystemFont, sans-serif";
+  const FONT_HEADING = "'Playfair Display', Georgia, serif";
 
-  const SEGMENT_KEYS = ["three", "two", "one", "none", "noData"];
-  const SEGMENT_COLORS = {
-    three: "#a50026", two: "#f46d43", one: "#f1eebc",
-    none: "#e4efff", noData: "#eaeaea"
+  // Burden colors — aligned with Color.docx palette
+  const BURDEN_COLORS = {
+    "-9": "#d0d0d0", "0": "#c8d8e4", "1": "#d4909e",
+    "2": "#b85c70", "3": "#8b1a2d"
   };
-  const SEGMENT_LABELS = {
+  const BURDEN_LABELS = {
+    "-9": "No Data", "0": "No burdens", "1": "One burden",
+    "2": "Two burdens", "3": "Three burdens"
+  };
+  const BURDEN_KEYS_ORDERED = ["3", "2", "1", "0", "-9"];
+
+  // For bar chart
+  const SEG_KEYS = ["three", "two", "one", "none", "noData"];
+  const SEG_LABELS = {
     three: "Three burdens", two: "Two burdens", one: "One burden",
     none: "No burdens", noData: "No data"
   };
-  const DOM_TO_SEG = { 3: "three", 2: "two", 1: "one", 0: "none" };
+  const SEG_COLORS = {
+    three: "#8b1a2d", two: "#b85c70", one: "#d4909e",
+    none: "#c8d8e4", noData: "#d0d0d0"
+  };
 
   const REGION_ORDER = [
-    "Sub-Saharan Africa", "South Asia", "East Asia & Pacific",
-    "Latin America & Caribbean",
-    "Middle East, North Africa, Afghanistan & Pakistan",
-    "Europe & Central Asia"
+    "Sub-Saharan Africa", "South Asia", "East Asia and Pacific",
+    "Latin America and the Caribbean",
+    "Middle East, North Africa, Afghanistan and Pakistan",
+    "Europe and Central Asia", "North America"
   ];
   const REGION_SHORT = {
     "Sub-Saharan Africa": "Sub-Saharan Africa",
     "South Asia": "South Asia",
-    "East Asia & Pacific": "East Asia & Pacific",
-    "Latin America & Caribbean": "Latin America & Caribbean",
-    "Middle East, North Africa, Afghanistan & Pakistan": "Middle East & North Africa",
-    "Europe & Central Asia": "Europe & Central Asia"
+    "East Asia and Pacific": "East Asia and Pacific",
+    "Latin America and the Caribbean": "Latin America and the Caribbean",
+    "Middle East, North Africa, Afghanistan and Pakistan": "Middle East and North Africa",
+    "Europe and Central Asia": "Europe and Central Asia",
+    "North America": "North America"
+  };
+  const REG_CODE_TO_NAME = {
+    "SSA": "Sub-Saharan Africa", "SA": "South Asia",
+    "EAP": "East Asia and Pacific", "LAC": "Latin America and the Caribbean",
+    "MENAAP": "Middle East, North Africa, Afghanistan and Pakistan",
+    "ECA": "Europe and Central Asia", "NorthAm": "North America"
+  };
+  const REGION_FILL = {
+    "Sub-Saharan Africa": "#8b1a2d",
+    "South Asia": "#b85c70",
+    "East Asia and Pacific": "#1a3a5c",
+    "Latin America and the Caribbean": "#d4909e",
+    "Middle East, North Africa, Afghanistan and Pakistan": "#6699cc",
+    "Europe and Central Asia": "#2e6da4",
+    "North America": "#c8d8e4"
   };
 
-  let datasets = null;
-  async function loadAll() {
-    if (datasets) return datasets;
-    const [world, countries, tbData] = await Promise.all([
-      fetch("data/world.json").then(r => r.json()),
-      fetch("data/tb_data_countries.json").then(r => r.json()),
-      fetch("data/tb_data.json").then(r => r.json()),
-    ]);
-    datasets = { world, countries, tbData };
-    return datasets;
-  }
-
-  // Build a rect path string for flubber target
-  function rectPath(x, y, w, h) {
-    return `M${x},${y}L${x + w},${y}L${x + w},${y + h}L${x},${y + h}Z`;
+  let tbCountries = null;
+  async function loadRegionData() {
+    if (tbCountries) return tbCountries;
+    tbCountries = await fetch("data/tb_countries.json").then(r => r.json());
+    return tbCountries;
   }
 
   // ═══════════════════════════════════════════════════════════
-  // MORPH SLIDE
+  // MAP SLIDE
   // ═══════════════════════════════════════════════════════════
-  async function initMorphSlide(sector, containerId) {
+  async function initMapSlide(sector, containerId) {
     const container = document.getElementById(containerId);
-    if (!container || container.querySelector("svg")) return;
+    if (!container || container.dataset.initialized) return;
+    container.dataset.initialized = "true";
 
-    const data = await loadAll();
-    const countryBurdens = data.countries[sector];
-    const regionData = data.tbData.regions[sector];
+    container.style.position = "relative";
 
-    // Parse geometry
-    let geo;
-    if (data.world.type === "Topology" && data.world.objects) {
-      geo = topojson.feature(data.world, data.world.objects.countries || Object.values(data.world.objects)[0]);
-    } else {
-      geo = data.world;
+    // Load ADM2 dissolved GeoJSON + region stats
+    let adm2, regionStats;
+    try {
+      const [adm2Data, tbData] = await Promise.all([
+        fetch("data/tb_adm2_" + sector + ".json").then(r => r.json()),
+        loadRegionData()
+      ]);
+      adm2 = adm2Data;
+      regionStats = tbData.regions[sector];
+    } catch (e) {
+      container.innerHTML = '<p style="color:#8b1a2d; padding:40px; font-family:' + FONT + '">Error loading map data: ' + e.message + '</p>';
+      return;
     }
 
-    const W = 1760, H = 820;
-    const svg = d3.select("#" + containerId)
+    // Use same projection as Replit app
+    const W = 960, H = 540;
+    const MAP_H = 460;
+    const svg = d3.select(container)
       .append("svg")
       .attr("viewBox", `0 0 ${W} ${H}`)
       .attr("width", "100%")
-      .attr("preserveAspectRatio", "xMidYMid meet");
+      .attr("height", "100%")
+      .attr("preserveAspectRatio", "xMidYMid meet")
+      .style("display", "block")
+      .style("background", "#f8f5f0");
 
-    // ── MAP ─────────────────────────────────────────────────
-    const projection = d3.geoNaturalEarth1().fitSize([W - 40, H - 80], geo);
+    const projection = d3.geoNaturalEarth1()
+      .scale(195)
+      .center([10, 15])
+      .translate([W / 2, MAP_H / 2]);
     const pathGen = d3.geoPath().projection(projection);
 
-    // Clip to sphere (fixes antimeridian-spanning countries)
+    // Flat path generator for pre-projected burden polygons (bypasses D3 winding)
+    function projectFeature(feat) {
+      const g = feat.geometry;
+      const projected = JSON.parse(JSON.stringify(g));
+      if (g.type === "Polygon") {
+        projected.coordinates = g.coordinates.map(ring =>
+          ring.map(c => { const p = projection(c); return p ? [p[0], p[1]] : [0, 0]; })
+        );
+      } else if (g.type === "MultiPolygon") {
+        projected.coordinates = g.coordinates.map(poly =>
+          poly.map(ring =>
+            ring.map(c => { const p = projection(c); return p ? [p[0], p[1]] : [0, 0]; })
+          )
+        );
+      }
+      return { ...feat, geometry: projected };
+    }
+    const flatPath = d3.geoPath(null);
+
+    // Clip
     const clipId = "clip-" + containerId;
     svg.append("defs").append("clipPath").attr("id", clipId)
-      .append("path").datum({ type: "Sphere" }).attr("d", pathGen);
-
-    // Ocean
-    svg.append("path").datum({ type: "Sphere" }).attr("d", pathGen)
-      .attr("fill", "#d0e2f2").attr("stroke", "#a8c4de").attr("stroke-width", 1)
-      .attr("class", "tb-ocean");
-
-    // Country group (clipped)
+      .append("rect").attr("width", W).attr("height", H);
     const mapG = svg.append("g").attr("clip-path", `url(#${clipId})`);
 
-    // For each country, determine its color from TB data
-    function getCountryColor(feature) {
-      const iso = feature.properties.iso3 || feature.properties.iso_a3 || feature.properties.ISO_A3 || feature.id;
-      const cb = countryBurdens[iso];
-      if (!cb || cb.dominant === -9 || cb.dominant === undefined) return SEGMENT_COLORS.noData;
-      return SEGMENT_COLORS[DOM_TO_SEG[cb.dominant]] || SEGMENT_COLORS.noData;
-    }
-
-    function getCountrySegment(feature) {
-      const iso = feature.properties.iso3 || feature.properties.iso_a3 || feature.properties.ISO_A3 || feature.id;
-      const cb = countryBurdens[iso];
-      if (!cb || cb.dominant === -9 || cb.dominant === undefined) return "noData";
-      return DOM_TO_SEG[cb.dominant] || "noData";
-    }
-
-    function getCountryRegion(feature) {
-      const iso = feature.properties.iso3 || feature.properties.iso_a3 || feature.properties.ISO_A3 || feature.id;
-      const cb = countryBurdens[iso];
-      return cb ? cb.region : null;
-    }
-
-    const countryPaths = mapG.selectAll("path.tb-country")
-      .data(geo.features)
-      .enter().append("path")
-      .attr("class", "tb-country")
+    // Ocean background (no outline)
+    mapG.append("path")
+      .datum({ type: "Sphere" })
       .attr("d", pathGen)
-      .attr("fill", d => getCountryColor(d))
+      .attr("fill", "#f8f5f0")
+      .attr("stroke", "#f8f5f0")
+      .attr("stroke-width", 3);
+
+    // Load world boundaries for base country fill
+    let worldGeo;
+    try {
+      const worldData = await fetch("data/world.json").then(r => r.json());
+      if (worldData.type === "Topology" && worldData.objects) {
+        worldGeo = topojson.feature(worldData, worldData.objects.countries || Object.values(worldData.objects)[0]);
+      } else {
+        worldGeo = worldData;
+      }
+    } catch (e) { /* proceed without base layer */ }
+
+    // Base country fills
+    if (worldGeo) {
+      mapG.selectAll("path.country-base")
+        .data(worldGeo.features)
+        .enter().append("path")
+        .attr("class", "country-base")
+        .attr("d", pathGen)
+        .attr("fill", "#f5f2ec")
+        .attr("stroke", "#f5f2ec")
+        .attr("stroke-width", 0.3);
+    }
+
+    // ADM2 dissolved burden polygons — pre-projected to bypass D3 winding issues
+    const projectedFeatures = adm2.features.map(f => projectFeature(f));
+    const burdenPaths = mapG.selectAll("path.burden")
+      .data(projectedFeatures)
+      .enter().append("path")
+      .attr("class", "burden")
+      .attr("d", flatPath)
+      .attr("fill", d => BURDEN_COLORS[String(d.properties.b)] || "#d0d0d0")
       .attr("stroke", "#fff")
-      .attr("stroke-width", 0.6);
+      .attr("stroke-width", 0.1)
+      .style("cursor", "pointer")
+      .on("mouseenter", function() {
+        d3.select(this).attr("stroke", "#333").attr("stroke-width", 0.8);
+      })
+      .on("mouseleave", function() {
+        d3.select(this).attr("stroke", "#fff").attr("stroke-width", 0.15);
+      })
+      .on("click", function(event, d) {
+        const regionCode = d.properties.r;
+        const regionName = REG_CODE_TO_NAME[regionCode];
+        if (regionName && REGION_ORDER.includes(regionName)) {
+          showCard(regionName);
+        }
+      });
+
+    // Country borders overlay
+    if (worldGeo) {
+      mapG.selectAll("path.country-border")
+        .data(worldGeo.features)
+        .enter().append("path")
+        .attr("class", "country-border")
+        .attr("d", pathGen)
+        .attr("fill", "none")
+        .attr("stroke", "rgba(100,90,80,0.2)")
+        .attr("stroke-width", 0.25)
+        .style("pointer-events", "none");
+    }
+
+    // Cover the projection boundary edge with a background-colored stroke on top
+    mapG.append("path")
+      .datum({ type: "Sphere" })
+      .attr("d", pathGen)
+      .attr("fill", "none")
+      .attr("stroke", "#f8f5f0")
+      .attr("stroke-width", 6)
+      .style("pointer-events", "none");
 
     // Legend
-    const legendG = svg.append("g").attr("class", "tb-legend")
-      .attr("transform", `translate(${W / 2 - 320}, ${H - 22})`);
+    const legendG = svg.append("g")
+      .attr("transform", `translate(${W / 2 - 280}, ${H - 45})`);
     let lx = 0;
-    SEGMENT_KEYS.forEach(seg => {
+    BURDEN_KEYS_ORDERED.forEach(key => {
       legendG.append("rect").attr("x", lx).attr("y", 0)
         .attr("width", 14).attr("height", 14).attr("rx", 2)
-        .attr("fill", SEGMENT_COLORS[seg]);
+        .attr("fill", BURDEN_COLORS[key]);
       const t = legendG.append("text").attr("x", lx + 19).attr("y", 11)
         .attr("fill", "#4a5568").attr("font-size", "13px")
-        .attr("font-family", FONT).text(SEGMENT_LABELS[seg]);
-      lx += (t.node().getComputedTextLength() || 80) + 28;
+        .attr("font-family", FONT).text(BURDEN_LABELS[key]);
+      lx += (t.node().getComputedTextLength() || 70) + 26;
     });
 
-    // ── BAR CHART LAYOUT (pre-computed) ─────────────────────
-    const MARGIN = { top: 20, right: 110, bottom: 50, left: 300 };
-    const chartW = W - MARGIN.left - MARGIN.right;
-    const chartH = H - MARGIN.top - MARGIN.bottom - 40;
+    // Source (bottom left)
+    svg.append("text")
+      .attr("x", 10).attr("y", H - 6)
+      .attr("fill", "#6b7280").attr("font-size", "11px").attr("font-style", "italic")
+      .attr("font-family", FONT)
+      .text("Source: World Bank Triple Burden Analysis (2025) | ADM2-level, 130+ countries");
+
+    // ── INTERACTIVE REGION CARDS ───────────────────────────
+    let activeCard = null;
+
+    function showCard(regionName) {
+      if (activeCard) activeCard.remove();
+
+      const rd = regionStats[regionName];
+      if (!rd) return;
+
+      burdenPaths.style("opacity", function(d) {
+        const rn = REG_CODE_TO_NAME[d.properties.r];
+        return rn === regionName ? 1 : 0.3;
+      });
+
+      const card = document.createElement("div");
+      card.style.cssText = `
+        position: absolute; top: 50%; right: 20px; transform: translateY(-50%);
+        width: 320px; background: rgba(255,255,255,0.97);
+        border: 1px solid #c8b8a2; border-left: 4px solid ${REGION_FILL[regionName] || "#8b1a2d"};
+        box-shadow: 0 4px 24px rgba(0,0,0,0.12); border-radius: 2px;
+        padding: 22px 22px 18px; z-index: 100; font-family: ${FONT};
+      `;
+
+      const threePct = (rd.three || 0).toFixed(1);
+      const twoPct = (rd.two || 0).toFixed(1);
+      const shortName = REGION_SHORT[regionName];
+
+      card.innerHTML = `
+        <p style="font-family:${FONT_HEADING}; font-weight:900; font-size:2.1em; color:#8b1a2d; margin:0; line-height:1.1;">
+          ${threePct}%
+        </p>
+        <p style="font-family:${FONT_HEADING}; font-weight:700; font-size:1.05em; color:#1a3a5c; margin:4px 0 0;">
+          ${shortName}
+        </p>
+        <p style="font-size:0.68em; text-transform:uppercase; letter-spacing:0.06em; font-weight:600; color:#6b7280; margin:6px 0 12px;">
+          Population facing three burdens
+        </p>
+        <div style="display:flex; gap:2px; height:18px; border-radius:3px; overflow:hidden; margin-bottom:12px;">
+          <div style="flex:${rd.three || 0.01}; background:#8b1a2d;"></div>
+          <div style="flex:${rd.two || 0.01}; background:#b85c70;"></div>
+          <div style="flex:${rd.one || 0.01}; background:#d4909e;"></div>
+          <div style="flex:${rd.none || 0.01}; background:#c8d8e4;"></div>
+          <div style="flex:${rd.noData || 0.01}; background:#d0d0d0;"></div>
+        </div>
+        <p style="font-size:0.76em; line-height:1.65; color:#444; margin:0;">
+          <strong>${threePct}%</strong> of ${shortName}'s population faces all three burdens —
+          poverty, ${sector === "water" ? "drought risk" : "flood risk"}, and inadequate ${sector === "water" ? "water access" : "sanitation"}.
+          Another <strong>${twoPct}%</strong> faces two.
+        </p>
+        <button style="
+          position:absolute; top:8px; right:12px; background:none; border:none;
+          font-size:0.72em; color:#6b7280; cursor:pointer; font-weight:700;
+          font-family:${FONT}; letter-spacing:0.04em;
+        ">CLOSE ×</button>
+      `;
+
+      card.querySelector("button").onclick = () => {
+        card.remove();
+        activeCard = null;
+        burdenPaths.style("opacity", 1);
+      };
+
+      container.appendChild(card);
+      activeCard = card;
+    }
+
+    // Click on empty area to close card
+    svg.on("click", function(event) {
+      if (event.target.tagName === "svg") {
+        if (activeCard) {
+          activeCard.remove();
+          activeCard = null;
+          burdenPaths.style("opacity", 1);
+        }
+      }
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // REGIONAL BAR CHART SLIDE
+  // ═══════════════════════════════════════════════════════════
+  async function initRegionChart(sector, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container || container.dataset.initialized) return;
+    container.dataset.initialized = "true";
+
+    const tbData = await loadRegionData();
+    const regionStats = tbData.regions[sector];
+    if (!regionStats) return;
+
+    const CW = 1760, CH = 820;
+    const chartSvg = d3.select(container)
+      .append("svg")
+      .attr("viewBox", `0 0 ${CW} ${CH}`)
+      .attr("width", "100%")
+      .attr("preserveAspectRatio", "xMidYMid meet");
+
+    const MARGIN = { top: 30, right: 120, bottom: 50, left: 300 };
+    const chartW = CW - MARGIN.left - MARGIN.right;
+    const chartH = CH - MARGIN.top - MARGIN.bottom - 40;
 
     const yScale = d3.scaleBand()
       .domain(REGION_ORDER.map(r => REGION_SHORT[r]))
       .range([0, chartH]).padding(0.25);
-
     const xScale = d3.scaleLinear().domain([0, 100]).range([0, chartW]);
 
-    // Pre-compute target rects for each (region, segment) combo
-    const targetRects = {};
-    regionData.forEach((rd, ri) => {
-      const label = REGION_SHORT[REGION_ORDER[ri]];
+    // Gridlines
+    chartSvg.append("g")
+      .attr("transform", `translate(${MARGIN.left},${MARGIN.top})`)
+      .call(d3.axisLeft(yScale).tickSize(-chartW).tickFormat(""))
+      .select(".domain").remove();
+    chartSvg.selectAll(".tick line").attr("stroke", "rgba(0,0,0,0.05)");
+
+    // Y axis
+    REGION_ORDER.forEach((region, i) => {
+      const label = REGION_SHORT[region];
+      chartSvg.append("text")
+        .attr("x", MARGIN.left - 14)
+        .attr("y", yScale(label) + MARGIN.top + yScale.bandwidth() / 2)
+        .attr("dy", "0.35em").attr("text-anchor", "end")
+        .attr("fill", i === 0 ? "#282c34" : "#4a5568")
+        .attr("font-size", "17px")
+        .attr("font-weight", i === 0 ? "700" : "400")
+        .attr("font-family", FONT).text(label);
+    });
+
+    // X axis
+    const xAxisG = chartSvg.append("g")
+      .attr("transform", `translate(${MARGIN.left},${MARGIN.top + chartH})`);
+    xAxisG.call(d3.axisBottom(xScale).ticks(5).tickFormat(d => d + "%"));
+    xAxisG.select(".domain").remove();
+    xAxisG.selectAll("text").attr("fill", "#6b7280").attr("font-size", "13px");
+    xAxisG.selectAll("line").attr("stroke", "rgba(0,0,0,0.07)");
+
+    // Bar segments with entrance animation
+    REGION_ORDER.forEach((region, ri) => {
+      const rd = regionStats[region];
+      if (!rd) return;
+      const label = REGION_SHORT[region];
       const barY = yScale(label) + MARGIN.top;
       const barH = yScale.bandwidth();
       let cumX = 0;
-      SEGMENT_KEYS.forEach(seg => {
+
+      SEG_KEYS.forEach((seg, si) => {
         const val = rd[seg] || 0;
         if (val <= 0) return;
-        const rx = MARGIN.left + xScale(cumX);
-        const rw = xScale(val);
-        targetRects[REGION_ORDER[ri] + "|" + seg] = { x: rx, y: barY, w: rw, h: barH };
+        const bx = MARGIN.left + xScale(cumX);
+        const bw = xScale(val);
         cumX += val;
+
+        chartSvg.append("rect")
+          .attr("x", bx).attr("y", barY)
+          .attr("width", 0).attr("height", barH)
+          .attr("fill", SEG_COLORS[seg])
+          .attr("rx", si === 0 ? 4 : 0)
+          .transition().delay(ri * 100 + si * 30).duration(600)
+          .ease(d3.easeCubicOut).attr("width", bw);
+
+        if (si > 0) {
+          chartSvg.append("line")
+            .attr("x1", bx).attr("x2", bx)
+            .attr("y1", barY).attr("y2", barY + barH)
+            .attr("stroke", "#fff").attr("stroke-width", 1.5)
+            .attr("opacity", 0)
+            .transition().delay(ri * 100 + si * 30 + 300).duration(300).attr("opacity", 1);
+        }
+
+        if ((seg === "three" || seg === "two") && val >= 5) {
+          chartSvg.append("text")
+            .attr("x", bx + bw / 2).attr("y", barY + barH / 2)
+            .attr("dy", "0.35em").attr("text-anchor", "middle")
+            .attr("fill", seg === "three" ? "#fff" : "#282c34")
+            .attr("font-size", val >= 15 ? "15px" : "13px")
+            .attr("font-weight", seg === "three" ? "700" : "500")
+            .attr("font-family", FONT)
+            .text(val.toFixed(1) + "%")
+            .attr("opacity", 0)
+            .transition().delay(ri * 100 + 400).duration(400).attr("opacity", 1);
+        }
       });
     });
 
-    // ── MORPH FUNCTION ──────────────────────────────────────
-    let morphed = false;
-
-    function morphToChart() {
-      if (morphed) return;
-      morphed = true;
-
-      // Fade ocean
-      svg.select(".tb-ocean").transition().duration(800).attr("opacity", 0);
-
-      // Remove clip so morphing paths aren't cut
-      mapG.attr("clip-path", null);
-
-      // Morph each country shape → target bar rect
-      countryPaths.each(function (d) {
-        const el = d3.select(this);
-        const seg = getCountrySegment(d);
-        const region = getCountryRegion(d);
-        const key = region + "|" + seg;
-        const target = targetRects[key];
-
-        if (!target) {
-          // No matching bar segment (unknown region) → just fade out
-          el.transition().duration(800).delay(Math.random() * 400)
-            .attr("opacity", 0);
-          return;
-        }
-
-        // Get current path string
-        const currentPath = el.attr("d");
-        if (!currentPath || currentPath.length < 5) {
-          el.transition().duration(600).attr("opacity", 0);
-          return;
-        }
-
-        // Morph to the full bar segment rectangle
-        const tPath = rectPath(target.x, target.y, target.w, target.h);
-
-        // Use flubber to interpolate
-        let interpolator;
-        try {
-          interpolator = flubber.interpolate(currentPath, tPath, { maxSegmentLength: 10 });
-        } catch (e) {
-          // Fallback: just move and shrink
-          el.transition().duration(1200).delay(Math.random() * 600)
-            .attr("transform", `translate(${target.x + target.w / 2},${target.y + target.h / 2}) scale(0.01)`)
-            .attr("opacity", 0);
-          return;
-        }
-
-        // Stagger by region for a structured "collapse" effect
-        const regionIdx = REGION_ORDER.indexOf(region);
-        const delay = 100 + (regionIdx >= 0 ? regionIdx * 120 : 0) + Math.random() * 200;
-
-        // Remove stroke during morph for cleaner look
-        el.transition().duration(1200).delay(delay)
-          .attrTween("d", () => interpolator)
-          .attr("stroke-width", 0)
-          .attr("fill", SEGMENT_COLORS[seg]);
-      });
-
-      // After morph: overlay clean bar segments + labels
-      const chartG = svg.append("g").attr("class", "tb-bars").attr("opacity", 0);
-
-      // Y axis labels
-      REGION_ORDER.forEach((region, i) => {
-        const label = REGION_SHORT[region];
-        chartG.append("text")
-          .attr("x", MARGIN.left - 14)
-          .attr("y", yScale(label) + MARGIN.top + yScale.bandwidth() / 2)
-          .attr("dy", "0.35em").attr("text-anchor", "end")
-          .attr("fill", i === 0 ? "#1a1a2e" : "#4a5568")
-          .attr("font-size", "17px")
-          .attr("font-weight", i === 0 ? "700" : "400")
-          .attr("font-family", FONT).text(label);
-      });
-
-      // X axis
-      const xAxisG = chartG.append("g")
-        .attr("transform", `translate(${MARGIN.left},${MARGIN.top + chartH})`);
-      xAxisG.call(d3.axisBottom(xScale).ticks(5).tickFormat(d => d + "%"));
-      xAxisG.select(".domain").remove();
-      xAxisG.selectAll("text").attr("fill", "#8898aa").attr("font-size", "13px");
-
-      // Clean bar outlines + percentage labels
-      regionData.forEach((rd, ri) => {
-        const label = REGION_SHORT[REGION_ORDER[ri]];
-        const barY = yScale(label) + MARGIN.top;
-        const barH = yScale.bandwidth();
-        let cumX = 0;
-
-        SEGMENT_KEYS.forEach((seg, si) => {
-          const val = rd[seg] || 0;
-          if (val <= 0) return;
-          const bx = MARGIN.left + xScale(cumX);
-          const bw = xScale(val);
-          cumX += val;
-
-          // Semi-transparent overlay rect for clean edges
-          chartG.append("rect")
-            .attr("x", bx).attr("y", barY)
-            .attr("width", bw).attr("height", barH)
-            .attr("fill", "none")
-            .attr("stroke", "#fff").attr("stroke-width", 1.5)
-            .attr("rx", si === 0 ? 4 : 0);
-
-          // Percentage labels
-          if ((seg === "three" || seg === "two") && val >= 5) {
-            chartG.append("text")
-              .attr("x", bx + bw / 2).attr("y", barY + barH / 2)
-              .attr("dy", "0.35em").attr("text-anchor", "middle")
-              .attr("fill", seg === "three" ? "#fff" : "#1a1a2e")
-              .attr("font-size", val >= 15 ? "15px" : "13px")
-              .attr("font-weight", seg === "three" ? "700" : "500")
-              .attr("font-family", FONT)
-              .text(val.toFixed(1) + "%");
-          }
-        });
-      });
-
-      // Headline callout
-      if (regionData[0] && regionData[0].three > 10) {
-        const topLabel = REGION_SHORT[REGION_ORDER[0]];
-        chartG.append("text")
-          .attr("x", MARGIN.left + chartW + 12)
-          .attr("y", yScale(topLabel) + MARGIN.top + yScale.bandwidth() / 2)
-          .attr("dy", "0.35em")
-          .attr("fill", "#a50026").attr("font-size", "26px")
-          .attr("font-weight", "900").attr("font-family", FONT)
-          .text(regionData[0].three.toFixed(1) + "%");
-      }
-
-      // Fade in the clean bar chart overlay after morph completes
-      chartG.transition().delay(1600).duration(500).attr("opacity", 1);
+    // Headline callout
+    const topRd = regionStats[REGION_ORDER[0]];
+    if (topRd && topRd.three > 10) {
+      const topLabel = REGION_SHORT[REGION_ORDER[0]];
+      chartSvg.append("text")
+        .attr("x", MARGIN.left + chartW + 14)
+        .attr("y", yScale(topLabel) + MARGIN.top + yScale.bandwidth() / 2)
+        .attr("dy", "0.35em")
+        .attr("fill", "#8b1a2d").attr("font-size", "26px")
+        .attr("font-weight", "900").attr("font-family", FONT)
+        .text(topRd.three.toFixed(1) + "%")
+        .attr("opacity", 0)
+        .transition().delay(800).duration(600).attr("opacity", 1);
     }
 
-    // Wire fragment event
-    if (typeof Reveal !== "undefined") {
-      Reveal.on("fragmentshown", function (event) {
-        const slide = Reveal.getCurrentSlide();
-        if (slide && slide.id === containerId.replace("tb-morph-", "triple-burden-")) {
-          morphToChart();
-        }
-      });
-    }
+    // Chart legend
+    const cLegG = chartSvg.append("g")
+      .attr("transform", `translate(${CW / 2 - 280}, ${CH - 22})`);
+    let clx = 0;
+    SEG_KEYS.forEach(seg => {
+      cLegG.append("rect").attr("x", clx).attr("y", 0)
+        .attr("width", 14).attr("height", 14).attr("rx", 2)
+        .attr("fill", SEG_COLORS[seg]);
+      const t = cLegG.append("text").attr("x", clx + 19).attr("y", 11)
+        .attr("fill", "#4a5568").attr("font-size", "13px")
+        .attr("font-family", FONT).text(SEG_LABELS[seg]);
+      clx += (t.node().getComputedTextLength() || 80) + 28;
+    });
   }
 
   // ═══════════════════════════════════════════════════════════
-  // INCOME GROUP BAR CHARTS (simple, no morph)
+  // INCOME GROUP BAR CHARTS
   // ═══════════════════════════════════════════════════════════
-  function drawBarChart(containerId, data) {
+  async function initIncomeSlide() {
+    const tbData = await fetch("data/tb_data.json").then(r => r.json());
+    drawIncomeChart("tb-income-water", tbData.incomeGroups.water);
+    drawIncomeChart("tb-income-sanitation", tbData.incomeGroups.sanitation);
+  }
+
+  function drawIncomeChart(containerId, data) {
     const container = document.getElementById(containerId);
     if (!container || container.querySelector("svg")) return;
 
@@ -339,22 +477,22 @@
     g.append("g").attr("class", "axis").call(d3.axisLeft(y).tickSize(0)).select(".domain").remove();
     g.selectAll(".axis text").style("font-size", "15px").style("font-family", FONT)
       .style("font-weight", (d, i) => i === 0 ? "700" : "400")
-      .style("fill", (d, i) => i === 0 ? "#1a1a2e" : "#4a5568");
+      .style("fill", (d, i) => i === 0 ? "#282c34" : "#4a5568");
     g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(x).ticks(5).tickFormat(d => d + "%")).select(".domain").remove();
 
     data.forEach((d, i) => {
       let cumX = 0;
-      SEGMENT_KEYS.forEach((seg, si) => {
+      SEG_KEYS.forEach((seg, si) => {
         const val = d[seg] || 0;
         if (val <= 0) return;
         g.append("rect").attr("x", x(cumX)).attr("y", y(d.label)).attr("height", y.bandwidth())
-          .attr("fill", SEGMENT_COLORS[seg]).attr("rx", si === 0 ? 3 : 0).attr("width", 0)
+          .attr("fill", SEG_COLORS[seg]).attr("rx", si === 0 ? 3 : 0).attr("width", 0)
           .transition().delay(i * 150 + si * 30).duration(700).ease(d3.easeCubicOut).attr("width", x(val));
         if ((seg === "three" || seg === "two") && val >= 5) {
           g.append("text").attr("x", x(cumX + val / 2)).attr("y", y(d.label) + y.bandwidth() / 2)
             .attr("dy", "0.35em").attr("text-anchor", "middle")
-            .attr("fill", seg === "three" ? "#fff" : "#1a1a2e")
+            .attr("fill", seg === "three" ? "#fff" : "#282c34")
             .attr("font-size", val >= 15 ? "14px" : "12px").attr("font-weight", seg === "three" ? "700" : "500")
             .attr("font-family", FONT).attr("opacity", 0).text(val.toFixed(1) + "%")
             .transition().delay(i * 150 + 500).duration(400).attr("opacity", 1);
@@ -366,35 +504,31 @@
     if (data[0] && data[0].three > 10) {
       svg.append("text").attr("x", margin.left + width + 8)
         .attr("y", margin.top + y(data[0].label) + y.bandwidth() / 2).attr("dy", "0.35em")
-        .attr("fill", "#a50026").attr("font-size", "22px").attr("font-weight", "900")
+        .attr("fill", "#8b1a2d").attr("font-size", "22px").attr("font-weight", "900")
         .attr("font-family", FONT).text(data[0].three.toFixed(1) + "%")
         .attr("opacity", 0).transition().delay(data.length * 150 + 400).duration(600).attr("opacity", 1);
     }
 
     const leg = svg.append("g").attr("transform", `translate(${margin.left}, ${H - 20})`);
     let legX = 0;
-    SEGMENT_KEYS.forEach(seg => {
+    SEG_KEYS.forEach(seg => {
       leg.append("rect").attr("x", legX).attr("y", 0).attr("width", 12).attr("height", 12)
-        .attr("rx", 2).attr("fill", SEGMENT_COLORS[seg]);
+        .attr("rx", 2).attr("fill", SEG_COLORS[seg]);
       const t = leg.append("text").attr("x", legX + 17).attr("y", 10)
-        .attr("fill", "#4a5568").attr("font-size", "12px").attr("font-family", FONT).text(SEGMENT_LABELS[seg]);
+        .attr("fill", "#4a5568").attr("font-size", "12px").attr("font-family", FONT).text(SEG_LABELS[seg]);
       legX += (t.node().getComputedTextLength() || 80) + 30;
     });
-  }
-
-  async function initIncomeSlide() {
-    const data = await loadAll();
-    drawBarChart("tb-income-water", data.tbData.incomeGroups.water);
-    drawBarChart("tb-income-sanitation", data.tbData.incomeGroups.sanitation);
   }
 
   // ═══════════════════════════════════════════════════════════
   // REVEAL WIRING
   // ═══════════════════════════════════════════════════════════
   const SLIDE_INIT = {
-    "triple-burden-water": () => initMorphSlide("water", "tb-morph-water"),
-    "triple-burden-sanitation": () => initMorphSlide("sanitation", "tb-morph-sanitation"),
-    "triple-burden-income": () => initIncomeSlide()
+    "triple-burden-water":           () => initMapSlide("water", "tb-map-water"),
+    "triple-burden-water-chart":     () => initRegionChart("water", "tb-chart-water"),
+    "triple-burden-sanitation":      () => initMapSlide("sanitation", "tb-map-sanitation"),
+    "triple-burden-sanitation-chart": () => initRegionChart("sanitation", "tb-chart-sanitation"),
+    "triple-burden-income":          () => initIncomeSlide()
   };
 
   function onSlideChanged(event) {

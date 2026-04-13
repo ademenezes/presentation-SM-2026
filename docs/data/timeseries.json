@@ -1,1 +1,341 @@
-{"Sub-Saharan Africa":[{"year":2007,"median15m3":0.0263,"median6m3":0.0105,"count":3},{"year":2008,"median15m3":0.7868,"median6m3":0.5245,"count":3},{"year":2009,"median15m3":4.5862,"median6m3":1.4601,"count":4},{"year":2010,"median15m3":1.8123,"median6m3":1.1651,"count":18},{"year":2011,"median15m3":4.4769,"median6m3":1.7908,"count":63},{"year":2012,"median15m3":7.0214,"median6m3":2.9764,"count":32},{"year":2013,"median15m3":4.1748,"median6m3":0.8337,"count":27},{"year":2014,"median15m3":7.1591,"median6m3":2.6783,"count":62},{"year":2015,"median15m3":8.4127,"median6m3":3.4774,"count":115},{"year":2016,"median15m3":8.0299,"median6m3":3.2227,"count":159},{"year":2017,"median15m3":8.8689,"median6m3":4.0805,"count":156},{"year":2018,"median15m3":10.94,"median6m3":4.4889,"count":186},{"year":2019,"median15m3":9.4796,"median6m3":4.3854,"count":181},{"year":2020,"median15m3":9.7765,"median6m3":4.7863,"count":160},{"year":2021,"median15m3":12.9262,"median6m3":7.6119,"count":124},{"year":2022,"median15m3":10.1086,"median6m3":4.2182,"count":105},{"year":2023,"median15m3":13.2989,"median6m3":5.6571,"count":94},{"year":2024,"median15m3":14.8853,"median6m3":4.3173,"count":18},{"year":2025,"median15m3":2.8775,"median6m3":1.1246,"count":17}],"East Asia & Pacific":[{"year":2000,"median15m3":10.3327,"median6m3":6.6133,"count":3},{"year":2006,"median15m3":4.1216,"median6m3":1.9095,"count":5},{"year":2008,"median15m3":20.2843,"median6m3":10.8445,"count":8},{"year":2009,"median15m3":12.7377,"median6m3":9.6387,"count":5},{"year":2010,"median15m3":9.1297,"median6m3":5.9207,"count":4},{"year":2011,"median15m3":5.6482,"median6m3":2.6255,"count":8},{"year":2012,"median15m3":10.2695,"median6m3":6.7103,"count":13},{"year":2013,"median15m3":4.3679,"median6m3":1.8063,"count":19},{"year":2014,"median15m3":10.3337,"median6m3":5.4138,"count":39},{"year":2015,"median15m3":31.7161,"median6m3":22.1585,"count":177},{"year":2016,"median15m3":6.311,"median6m3":2.4726,"count":399},{"year":2017,"median15m3":36.0001,"median6m3":24.7573,"count":208},{"year":2018,"median15m3":37.659,"median6m3":27.2299,"count":194},{"year":2019,"median15m3":36.0977,"median6m3":25.2864,"count":204},{"year":2020,"median15m3":37.2098,"median6m3":27.3103,"count":170},{"year":2021,"median15m3":36.7217,"median6m3":27.1738,"count":194},{"year":2022,"median15m3":40.3658,"median6m3":28.8977,"count":165},{"year":2023,"median15m3":40.532,"median6m3":28.5675,"count":180},{"year":2024,"median15m3":42.7214,"median6m3":31.5063,"count":124}],"Europe & Central Asia":[{"year":2005,"median15m3":9.0517,"median6m3":3.6207,"count":3},{"year":2006,"median15m3":15.3455,"median6m3":6.1382,"count":4},{"year":2007,"median15m3":9.5937,"median6m3":3.8375,"count":8},{"year":2008,"median15m3":11.7055,"median6m3":4.6822,"count":12},{"year":2009,"median15m3":15.3007,"median6m3":6.1203,"count":10},{"year":2010,"median15m3":8.5351,"median6m3":3.414,"count":72},{"year":2011,"median15m3":4.7518,"median6m3":1.9007,"count":102},{"year":2012,"median15m3":13.8039,"median6m3":5.5024,"count":99},{"year":2013,"median15m3":15.24,"median6m3":6.2446,"count":134},{"year":2014,"median15m3":4.6941,"median6m3":1.8754,"count":830},{"year":2015,"median15m3":6.6645,"median6m3":2.6658,"count":1310},{"year":2016,"median15m3":5.8158,"median6m3":2.3263,"count":1264},{"year":2017,"median15m3":5.7813,"median6m3":2.319,"count":1238},{"year":2018,"median15m3":6.768,"median6m3":2.7072,"count":1327},{"year":2019,"median15m3":8.702,"median6m3":3.5026,"count":1133},{"year":2020,"median15m3":12.5486,"median6m3":5.0758,"count":1002},{"year":2021,"median15m3":9.0621,"median6m3":3.6678,"count":1064},{"year":2022,"median15m3":19.5168,"median6m3":8.2654,"count":698},{"year":2023,"median15m3":21.686,"median6m3":9.0792,"count":506},{"year":2024,"median15m3":16.8971,"median6m3":7.5018,"count":603},{"year":2025,"median15m3":26.4214,"median6m3":11.1142,"count":221}],"Latin America & Caribbean":[{"year":2008,"median15m3":3.6393,"median6m3":1.578,"count":20},{"year":2009,"median15m3":4.358,"median6m3":2.0379,"count":10},{"year":2010,"median15m3":6.0019,"median6m3":4.0768,"count":28},{"year":2011,"median15m3":4.9348,"median6m3":3.3399,"count":35},{"year":2012,"median15m3":6.9053,"median6m3":4.0887,"count":38},{"year":2013,"median15m3":4.0367,"median6m3":2.0085,"count":72},{"year":2014,"median15m3":8.0288,"median6m3":4.846,"count":104},{"year":2015,"median15m3":9.9119,"median6m3":4.8322,"count":577},{"year":2016,"median15m3":12.3104,"median6m3":6.0248,"count":685},{"year":2017,"median15m3":8.913,"median6m3":4.894,"count":899},{"year":2018,"median15m3":11.6302,"median6m3":5.741,"count":775},{"year":2019,"median15m3":9.2167,"median6m3":5.0527,"count":910},{"year":2020,"median15m3":10.676,"median6m3":5.824,"count":681},{"year":2021,"median15m3":11.8095,"median6m3":5.8662,"count":785},{"year":2022,"median15m3":9.4609,"median6m3":5.3769,"count":828},{"year":2023,"median15m3":10.9331,"median6m3":5.9663,"count":755},{"year":2024,"median15m3":16.6665,"median6m3":8.6403,"count":479},{"year":2025,"median15m3":35.7508,"median6m3":23.6566,"count":51}],"Middle East, North Africa, Afghanistan & Pakistan":[{"year":2005,"median15m3":1.3768,"median6m3":0.5507,"count":8},{"year":2012,"median15m3":8.7337,"median6m3":3.4935,"count":4},{"year":2014,"median15m3":5.6591,"median6m3":2.3453,"count":17},{"year":2015,"median15m3":26.1428,"median6m3":10.1036,"count":24},{"year":2016,"median15m3":24.2736,"median6m3":10.7883,"count":113},{"year":2017,"median15m3":0.1591,"median6m3":0.0705,"count":87},{"year":2018,"median15m3":0.1569,"median6m3":0.0692,"count":79},{"year":2019,"median15m3":36.8873,"median6m3":13.9348,"count":28},{"year":2020,"median15m3":38.9683,"median6m3":14.7768,"count":12},{"year":2021,"median15m3":19.1564,"median6m3":7.6626,"count":3},{"year":2023,"median15m3":35.2118,"median6m3":13.384,"count":12}],"South Asia":[{"year":2004,"median15m3":0.4274,"median6m3":0.0,"count":5},{"year":2006,"median15m3":0.3417,"median6m3":0.1367,"count":3},{"year":2008,"median15m3":1.4049,"median6m3":0.4068,"count":5},{"year":2009,"median15m3":0.4033,"median6m3":0.2557,"count":3},{"year":2011,"median15m3":1.6763,"median6m3":0.2733,"count":6},{"year":2012,"median15m3":1.2814,"median6m3":0.5021,"count":3},{"year":2013,"median15m3":1.5661,"median6m3":0.7418,"count":4},{"year":2014,"median15m3":1.4775,"median6m3":0.591,"count":7},{"year":2015,"median15m3":2.4723,"median6m3":2.4723,"count":39},{"year":2017,"median15m3":1.4104,"median6m3":0.6582,"count":11},{"year":2019,"median15m3":1.9884,"median6m3":1.3158,"count":5},{"year":2022,"median15m3":1.3482,"median6m3":0.5393,"count":3},{"year":2024,"median15m3":1.1013,"median6m3":1.1013,"count":15}],"Global":[{"year":2004,"median15m3":1.8251,"count":10},{"year":2005,"median15m3":1.7898,"count":13},{"year":2006,"median15m3":3.6598,"count":14},{"year":2007,"median15m3":4.3281,"count":16},{"year":2008,"median15m3":4.4189,"count":48},{"year":2009,"median15m3":6.2814,"count":32},{"year":2010,"median15m3":6.5204,"count":124},{"year":2011,"median15m3":4.4769,"count":215},{"year":2012,"median15m3":8.4061,"count":189},{"year":2013,"median15m3":7.9099,"count":256},{"year":2014,"median15m3":5.0815,"count":1059},{"year":2015,"median15m3":8.1358,"count":2242},{"year":2016,"median15m3":7.9628,"count":2622},{"year":2017,"median15m3":7.7655,"count":2599},{"year":2018,"median15m3":9.3107,"count":2563},{"year":2019,"median15m3":10.1161,"count":2461},{"year":2020,"median15m3":12.3617,"count":2027},{"year":2021,"median15m3":11.9416,"count":2171},{"year":2022,"median15m3":14.9743,"count":1799},{"year":2023,"median15m3":17.943,"count":1549},{"year":2024,"median15m3":19.2646,"count":1240},{"year":2025,"median15m3":27.0696,"count":292},{"year":2026,"median15m3":40.6727,"count":8251}]}
+{
+  "East Asia and Pacific": [
+    {
+      "year": 2014,
+      "median15m3": 20.76,
+      "count": 132
+    },
+    {
+      "year": 2015,
+      "median15m3": 15.6,
+      "count": 359
+    },
+    {
+      "year": 2016,
+      "median15m3": 25.92,
+      "count": 454
+    },
+    {
+      "year": 2017,
+      "median15m3": 29.29,
+      "count": 469
+    },
+    {
+      "year": 2018,
+      "median15m3": 32.1,
+      "count": 359
+    },
+    {
+      "year": 2019,
+      "median15m3": 33.22,
+      "count": 334
+    },
+    {
+      "year": 2020,
+      "median15m3": 34.44,
+      "count": 318
+    },
+    {
+      "year": 2021,
+      "median15m3": 35.28,
+      "count": 294
+    },
+    {
+      "year": 2022,
+      "median15m3": 38.51,
+      "count": 294
+    },
+    {
+      "year": 2023,
+      "median15m3": 41.87,
+      "count": 255
+    },
+    {
+      "year": 2024,
+      "median15m3": 44.98,
+      "count": 162
+    }
+  ],
+  "Europe and Central Asia": [
+    {
+      "year": 2014,
+      "median15m3": 20.43,
+      "count": 724
+    },
+    {
+      "year": 2015,
+      "median15m3": 22.63,
+      "count": 1140
+    },
+    {
+      "year": 2016,
+      "median15m3": 22.64,
+      "count": 1296
+    },
+    {
+      "year": 2017,
+      "median15m3": 22.64,
+      "count": 1266
+    },
+    {
+      "year": 2018,
+      "median15m3": 26.83,
+      "count": 1314
+    },
+    {
+      "year": 2019,
+      "median15m3": 31.7,
+      "count": 1364
+    },
+    {
+      "year": 2020,
+      "median15m3": 31.7,
+      "count": 1404
+    },
+    {
+      "year": 2021,
+      "median15m3": 32.13,
+      "count": 1262
+    },
+    {
+      "year": 2022,
+      "median15m3": 41.22,
+      "count": 1049
+    },
+    {
+      "year": 2023,
+      "median15m3": 41.22,
+      "count": 866
+    },
+    {
+      "year": 2024,
+      "median15m3": 37.91,
+      "count": 544
+    }
+  ],
+  "Latin America and the Caribbean": [
+    {
+      "year": 2014,
+      "median15m3": 15.91,
+      "count": 373
+    },
+    {
+      "year": 2015,
+      "median15m3": 17.78,
+      "count": 729
+    },
+    {
+      "year": 2016,
+      "median15m3": 17.78,
+      "count": 1132
+    },
+    {
+      "year": 2017,
+      "median15m3": 21.47,
+      "count": 1222
+    },
+    {
+      "year": 2018,
+      "median15m3": 20.15,
+      "count": 1331
+    },
+    {
+      "year": 2019,
+      "median15m3": 21.66,
+      "count": 1218
+    },
+    {
+      "year": 2020,
+      "median15m3": 25.44,
+      "count": 1225
+    },
+    {
+      "year": 2021,
+      "median15m3": 25.44,
+      "count": 1191
+    },
+    {
+      "year": 2022,
+      "median15m3": 25.25,
+      "count": 1231
+    },
+    {
+      "year": 2023,
+      "median15m3": 25.25,
+      "count": 1080
+    },
+    {
+      "year": 2024,
+      "median15m3": 27.79,
+      "count": 649
+    }
+  ],
+  "Middle East, North Africa, Afghanistan and Pakistan": [
+    {
+      "year": 2015,
+      "median15m3": 44.25,
+      "count": 44
+    },
+    {
+      "year": 2016,
+      "median15m3": 43.68,
+      "count": 57
+    },
+    {
+      "year": 2017,
+      "median15m3": 40.39,
+      "count": 51
+    },
+    {
+      "year": 2018,
+      "median15m3": 34.45,
+      "count": 44
+    },
+    {
+      "year": 2019,
+      "median15m3": 34.45,
+      "count": 43
+    },
+    {
+      "year": 2020,
+      "median15m3": 35.13,
+      "count": 28
+    },
+    {
+      "year": 2023,
+      "median15m3": 37.36,
+      "count": 12
+    }
+  ],
+  "South Asia": [
+    {
+      "year": 2015,
+      "median15m3": 8.46,
+      "count": 34
+    },
+    {
+      "year": 2017,
+      "median15m3": 4.49,
+      "count": 10
+    },
+    {
+      "year": 2024,
+      "median15m3": 4.58,
+      "count": 14
+    }
+  ],
+  "Sub-Saharan Africa": [
+    {
+      "year": 2014,
+      "median15m3": 19.13,
+      "count": 119
+    },
+    {
+      "year": 2015,
+      "median15m3": 21.75,
+      "count": 223
+    },
+    {
+      "year": 2016,
+      "median15m3": 23.9,
+      "count": 280
+    },
+    {
+      "year": 2017,
+      "median15m3": 25.01,
+      "count": 326
+    },
+    {
+      "year": 2018,
+      "median15m3": 28.56,
+      "count": 339
+    },
+    {
+      "year": 2019,
+      "median15m3": 30.2,
+      "count": 344
+    },
+    {
+      "year": 2020,
+      "median15m3": 31.62,
+      "count": 298
+    },
+    {
+      "year": 2021,
+      "median15m3": 32.94,
+      "count": 248
+    },
+    {
+      "year": 2022,
+      "median15m3": 37.75,
+      "count": 201
+    },
+    {
+      "year": 2023,
+      "median15m3": 38.65,
+      "count": 145
+    },
+    {
+      "year": 2024,
+      "median15m3": 40.79,
+      "count": 78
+    }
+  ],
+  "Global": [
+    {
+      "year": 2014,
+      "median15m3": 19.78,
+      "count": 4
+    },
+    {
+      "year": 2015,
+      "median15m3": 19.77,
+      "count": 6
+    },
+    {
+      "year": 2016,
+      "median15m3": 23.9,
+      "count": 5
+    },
+    {
+      "year": 2017,
+      "median15m3": 23.83,
+      "count": 6
+    },
+    {
+      "year": 2018,
+      "median15m3": 28.56,
+      "count": 5
+    },
+    {
+      "year": 2019,
+      "median15m3": 31.7,
+      "count": 5
+    },
+    {
+      "year": 2020,
+      "median15m3": 31.7,
+      "count": 5
+    },
+    {
+      "year": 2021,
+      "median15m3": 32.53,
+      "count": 4
+    },
+    {
+      "year": 2022,
+      "median15m3": 38.13,
+      "count": 4
+    },
+    {
+      "year": 2023,
+      "median15m3": 38.65,
+      "count": 5
+    },
+    {
+      "year": 2024,
+      "median15m3": 37.91,
+      "count": 5
+    }
+  ]
+}

@@ -8,42 +8,54 @@
 
 /* ── Design tokens ──────────────────────────────────────────── */
 :root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f7f8fa;
-  --bg-card: #f0f2f5;
-  --bg-accent: #eef5fa;
-  --text-primary: #1a1a2e;
+  --bg-primary: #f8f5f0;
+  --bg-secondary: #f0ece6;
+  --bg-card: #ebe7e0;
+  --bg-accent: #f0e8e4;
+  --text-primary: #282c34;
   --text-secondary: #4a5568;
-  --text-muted: #8898aa;
-  --accent-blue: #0071bc;
-  --accent-blue-light: #4da3d4;
-  --accent-orange: #e8553a;
-  --accent-green: #2b9f93;
-  --accent-purple: #6c4fa0;
-  --accent-yellow: #d4a017;
-  --accent-pink: #c7365f;
+  --text-muted: #6b7280;
+  --color-maroon: #8b1a2d;
+  --color-navy: #1a3a5c;
+  --accent-blue: #1a3a5c;
+  --accent-blue-light: #2e6da4;
+  --accent-orange: #8b1a2d;
+  --accent-green: #2e6da4;
+  --accent-purple: #6699cc;
+  --accent-yellow: #b85c70;
+  --accent-pink: #d4909e;
   --border-light: rgba(0, 0, 0, 0.08);
   --grid-color: rgba(0, 0, 0, 0.07);
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
   --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
-  --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --font-heading: "Playfair Display", Georgia, serif;
+  --font-display: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
 
-  /* Region colors — optimized for light backgrounds */
-  --color-ssa: #e8553a;
-  --color-eap: #0071bc;
-  --color-eca: #6c4fa0;
-  --color-lac: #2b9f93;
-  --color-menap: #d4a017;
-  --color-sar: #c7365f;
+  /* Region colors — Economist-style palette (blue-to-red by spending gap) */
+  --color-ssa: #8b1a2d;
+  --color-eap: #2e6da4;
+  --color-eca: #6699cc;
+  --color-lac: #d4909e;
+  --color-menap: #b85c70;
+  --color-sar: #1a3a5c;
+  --color-nam: #c8d8e4;
+
+  /* Opposite/deselection colors */
+  --opposite-navy: #8da8be;
+  --opposite-blue: #a5bdd6;
+  --opposite-rose: #c9a0a8;
+  --opposite-maroon: #e8b4c0;
+  --color-nonselect: #c8d8e4;
+  --bg-graphical: #d8e8f0;
 }
 
-/* ── System font stack (OWID-style) — no external imports ─── */
+/* ── Economist-style fonts (Playfair Display + Nunito) ──────── */
 
 /* ── Reveal.js overrides ────────────────────────────────────── */
 .reveal {
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: 34px;
   color: var(--text-primary);
 }
 
@@ -56,6 +68,7 @@
   padding: 40px 60px;
   height: 100%;
   box-sizing: border-box;
+  overflow: visible;
 }
 
 .reveal .slide-background {
@@ -64,26 +77,35 @@
 
 /* ── Typography ─────────────────────────────────────────────── */
 .reveal h1 {
+  font-family: var(--font-heading);
   font-size: 3.2em;
   font-weight: 900;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   line-height: 1.05;
-  color: var(--text-primary);
+  color: var(--color-maroon);
   margin-bottom: 0.3em;
 }
 
 .reveal h2 {
+  font-family: var(--font-heading);
   font-size: 2.2em;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   line-height: 1.15;
-  color: var(--text-primary);
+  color: var(--color-navy);
   margin-bottom: 0.4em;
 }
 
 .reveal h3 {
-  font-size: 1.4em;
-  font-weight: 600;
+  font-family: var(--font-heading);
+  font-size: 1.8em;
+  font-weight: 900;
+  color: var(--color-maroon);
+  letter-spacing: -0.02em;
+  border-bottom: 4px solid;
+  border-image: linear-gradient(90deg, #8b1a2d, #b85c70) 1;
+  padding-bottom: 0.3em;
+  display: inline-block;
   color: var(--text-secondary);
   letter-spacing: -0.01em;
   margin-bottom: 0.6em;
@@ -102,12 +124,12 @@
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  background: linear-gradient(135deg, #f7f8fa 0%, #eef5fa 50%, #e8f0f8 100%) !important;
+  background: var(--bg-primary) !important;
 }
 
 .title-slide h1 {
   font-size: 4em;
-  color: var(--accent-blue);
+  color: var(--color-maroon);
 }
 
 .title-slide .subtitle {
@@ -127,7 +149,7 @@
 /* ── Insight box — key takeaway per slide ─────────────────── */
 .insight-box {
   background: var(--bg-accent);
-  border-left: 4px solid var(--accent-blue);
+  border-left: 4px solid var(--color-maroon);
   padding: 16px 24px;
   border-radius: 0 8px 8px 0;
   margin: 16px 0;
@@ -143,18 +165,20 @@
 }
 
 .insight-box .insight-number {
+  font-family: var(--font-heading);
   font-size: 2em;
   font-weight: 900;
-  color: var(--accent-blue);
+  color: var(--color-maroon);
   display: block;
   margin-bottom: 4px;
 }
 
 /* ── Big number callout ─────────────────────────────────────── */
 .big-number {
+  font-family: var(--font-heading);
   font-size: 6em;
   font-weight: 900;
-  color: var(--accent-blue);
+  color: var(--color-maroon);
   line-height: 1;
   letter-spacing: -0.04em;
 }
@@ -220,7 +244,7 @@
   position: absolute;
   padding: 12px 20px;
   background: rgba(255, 255, 255, 0.95);
-  border-left: 3px solid var(--accent-blue);
+  border-left: 3px solid var(--color-maroon);
   border-radius: 0 6px 6px 0;
   box-shadow: var(--shadow-md);
   font-size: 0.9em;
@@ -301,8 +325,8 @@
 }
 
 .chart-title {
-  fill: var(--text-primary);
-  font-family: var(--font-display);
+  fill: var(--color-navy);
+  font-family: var(--font-heading);
   font-size: 24px;
   font-weight: 700;
 }
@@ -323,9 +347,10 @@
 }
 
 .stat-value {
+  font-family: var(--font-heading);
   font-size: 4em;
   font-weight: 900;
-  color: var(--accent-blue);
+  color: var(--color-maroon);
   font-variant-numeric: tabular-nums;
 }
 
@@ -354,9 +379,10 @@
 }
 
 .metric-card .metric-value {
+  font-family: var(--font-heading);
   font-size: 3.2em;
   font-weight: 900;
-  color: var(--accent-blue);
+  color: var(--color-maroon);
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
 }
@@ -384,7 +410,7 @@
   margin-bottom: 0.5em;
   border-radius: 8px;
   background: var(--bg-secondary);
-  border-left: 4px solid var(--accent-blue);
+  border-left: 4px solid var(--color-maroon);
   opacity: 0;
   transform: translateX(-20px);
   transition: all 0.5s ease;
@@ -397,7 +423,7 @@
 }
 
 .policy-points li .highlight {
-  color: var(--accent-blue);
+  color: var(--color-maroon);
   font-weight: 700;
 }
 
@@ -428,9 +454,19 @@
   position: absolute;
   bottom: 20px;
   left: 60px;
+  right: 60px;
   font-size: 0.65em;
   color: var(--text-muted);
   font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Light source text for dark background slides */
+.source-light,
+.source-light p {
+  color: rgba(255, 255, 255, 0.5) !important;
 }
 
 /* ── Image slides (triple burden, continental drying) ────────── */
@@ -493,9 +529,261 @@
 .divider {
   width: 60px;
   height: 4px;
-  background: var(--accent-blue);
+  background: var(--color-maroon);
   border-radius: 2px;
   margin: 16px 0;
+}
+
+/* ── Economist-style section rule ──────────────────────────── */
+.econ-section-rule {
+  border-top: 3px solid var(--color-maroon);
+  padding-top: 1em;
+}
+
+/* ── Uppercase label (e.g., "WATER & SANITATION") ──────────── */
+.uppercase-label {
+  font-family: var(--font-heading);
+  font-size: 0.65em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--color-maroon);
+}
+
+/* ── fullscreen interactive iframe ─────────────────────────── */
+#spending-gap,
+#budget-execution {
+  padding: 0 !important;
+  overflow: hidden;
+  background: transparent !important;
+}
+#spending-gap h2,
+#budget-execution h2 {
+  display: none !important;
+}
+
+/* ── iframe crop container ─────────────────────────────────── */
+.iframe-crop {
+  overflow: hidden !important;
+  position: relative;
+}
+
+.iframe-crop iframe {
+  display: block;
+}
+
+/* Prevent Reveal.js auto-stretch from resizing iframe containers */
+.reveal .slides section .iframe-crop,
+.reveal .slides section .iframe-crop iframe {
+  max-width: none !important;
+}
+
+/* ── Crisis stats grid (water-crisis-scale slide) ──────────── */
+.crisis-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px 100px;
+  max-width: 1500px;
+  margin: 60px auto 0;
+  padding: 0 40px;
+}
+
+.crisis-stat {
+  position: relative;
+}
+
+.crisis-icon {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.crisis-accent {
+  width: 48px;
+  height: 3px;
+  background: var(--color-maroon);
+  margin: 10px 0 16px;
+  border-radius: 2px;
+}
+
+.crisis-value {
+  font-family: var(--font-heading);
+  font-size: 1.1em;
+  font-weight: 700;
+  color: var(--color-maroon);
+  line-height: 1.1;
+  margin-bottom: 10px;
+}
+
+.info-number {
+  font-family: var(--font-heading);
+  font-size: 3em;
+  font-weight: 900;
+  color: var(--color-maroon);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.info-number-inline {
+  font-size: 2.4em;
+}
+
+.crisis-desc {
+  font-size: 1.15em;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.crisis-sub {
+  font-size: 1em;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.crisis-sub strong {
+  color: var(--color-navy);
+  font-weight: 700;
+}
+
+/* ── Triple Burden Venn slide-left transition ──────────────── */
+#tb-venn.tb-venn-centered {
+  transform: translateX(0) scale(1);
+  transform-origin: center center;
+}
+#tb-venn.tb-venn-shifted {
+  transform: translateX(-25%) scale(0.72);
+  transform-origin: center center;
+}
+#tb-explainer.tb-explainer-visible {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}
+
+/* ── Background iframe fit ──────────────────────────────────── */
+.slide-background-content iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+}
+/* Cover the iframe's internal top border */
+.iframe-border-cover {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background: #f8f5f0;
+  z-index: 9999;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+.reveal section.iframe-slide {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* ── Hidden fragment triggers ───────────────────────────────── */
+.world-line-trigger {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* ── Dark background slide override ─────────────────────────── */
+#water-crisis-scale {
+  background: transparent !important;
+}
+
+/* ── Dark-themed crisis grid (navy background slide) ────────── */
+.crisis-grid-dark .crisis-value {
+  color: #ffffff;
+}
+.crisis-grid-dark .crisis-value .info-number {
+  color: #ffffff;
+}
+.crisis-grid-dark .crisis-accent {
+  background: #d4909e;
+}
+.crisis-grid-dark .crisis-desc {
+  color: rgba(255, 255, 255, 0.9);
+}
+.crisis-grid-dark .crisis-sub {
+  color: rgba(255, 255, 255, 0.6);
+}
+.crisis-grid-dark .crisis-sub strong {
+  color: #c8d8e4;
+}
+
+/* ── Triple Burden Venn animation ───────────────────────────── */
+
+/* Circles start off-screen and converge */
+.tb-circle, .tb-center, .tb-flow, .tb-label, .tb-center-text {
+  opacity: 0;
+}
+
+/* When slide is active, animate everything */
+.reveal section.present .tb-circle-1 {
+  animation: tb-enter-left 2.5s 0.3s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+.reveal section.present .tb-circle-2 {
+  animation: tb-enter-right 2.5s 0.7s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+.reveal section.present .tb-circle-3 {
+  animation: tb-enter-bottom 2.5s 1.1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+.reveal section.present .tb-center {
+  animation: tb-scale-in 1.0s 3.0s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+.reveal section.present .tb-flow-1 {
+  animation: tb-draw-path 1.5s 2.5s ease-in-out forwards, tb-pulse-flow 3s 4.0s ease-in-out infinite;
+}
+.reveal section.present .tb-flow-2 {
+  animation: tb-draw-path 1.5s 2.8s ease-in-out forwards, tb-pulse-flow 3s 4.3s ease-in-out infinite;
+}
+.reveal section.present .tb-flow-3 {
+  animation: tb-draw-path 1.5s 3.1s ease-in-out forwards, tb-pulse-flow 3s 4.6s ease-in-out infinite;
+}
+.reveal section.present .tb-label-1 {
+  animation: tb-fade-in 0.8s 2.2s ease-out forwards;
+}
+.reveal section.present .tb-label-2 {
+  animation: tb-fade-in 0.8s 2.8s ease-out forwards;
+}
+.reveal section.present .tb-label-3 {
+  animation: tb-fade-in 0.8s 3.4s ease-out forwards;
+}
+.reveal section.present .tb-center-text {
+  animation: tb-fade-in 0.8s 3.8s ease-out forwards;
+}
+
+@keyframes tb-enter-left {
+  from { transform: translateX(-250px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 0.7; }
+}
+@keyframes tb-enter-right {
+  from { transform: translateX(250px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 0.7; }
+}
+@keyframes tb-enter-bottom {
+  from { transform: translateY(200px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 0.7; }
+}
+@keyframes tb-scale-in {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+@keyframes tb-draw-path {
+  from { stroke-dashoffset: 200; opacity: 0; }
+  to   { stroke-dashoffset: 0; opacity: 0.8; }
+}
+@keyframes tb-pulse-flow {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 0.9; }
+}
+@keyframes tb-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Responsive adjustments ─────────────────────────────────── */

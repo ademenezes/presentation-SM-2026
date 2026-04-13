@@ -7,20 +7,20 @@
   "use strict";
 
   const REGION_COLORS = {
-    "Sub-Saharan Africa": "#e8553a",
-    "East Asia & Pacific": "#0071bc",
-    "Europe & Central Asia": "#6c4fa0",
-    "Latin America & Caribbean": "#2b9f93",
-    "Middle East, North Africa, Afghanistan & Pakistan": "#d4a017",
-    "South Asia": "#c7365f",
+    "Sub-Saharan Africa": "#8b1a2d",
+    "East Asia and Pacific": "#2e6da4",
+    "Europe and Central Asia": "#6699cc",
+    "Latin America and the Caribbean": "#d4909e",
+    "Middle East, North Africa, Afghanistan and Pakistan": "#b85c70",
+    "South Asia": "#1a3a5c",
   };
 
   const REGION_SHORT = {
     "Sub-Saharan Africa": "Sub-Saharan Africa",
-    "East Asia & Pacific": "East Asia & Pacific",
-    "Europe & Central Asia": "Europe & Central Asia",
-    "Latin America & Caribbean": "Latin America",
-    "Middle East, North Africa, Afghanistan & Pakistan": "MENA",
+    "East Asia and Pacific": "East Asia and Pacific",
+    "Europe and Central Asia": "Europe and Central Asia",
+    "Latin America and the Caribbean": "Latin America",
+    "Middle East, North Africa, Afghanistan and Pakistan": "MENAAP",
     "South Asia": "South Asia",
   };
 
@@ -66,8 +66,8 @@
     svg.append("path")
       .datum({ type: "Sphere" })
       .attr("d", path)
-      .attr("fill", "#d0e2f2")
-      .attr("stroke", "#a8c4de")
+      .attr("fill", "#e8ddd4")
+      .attr("stroke", "#d4c8bc")
       .attr("stroke-width", 1.5);
 
     // Layer 1: country fills (no strokes — strokes drawn separately on top)
@@ -80,8 +80,8 @@
       .attr("fill", (d) => {
         const iso3 = d.properties.iso3 || d.properties.iso_a3 || d.properties.ISO_A3 || d.id;
         const cd = countryData[iso3];
-        if (cd) return REGION_COLORS[cd.region] || "#0071bc";
-        return "#eaeaea";
+        if (cd) return REGION_COLORS[cd.region] || "#1a3a5c";
+        return "#e0dbd5";
       })
       .attr("stroke", "none");
 
@@ -112,7 +112,7 @@
         const iso3 = d.properties.iso3 || d.properties.iso_a3 || d.properties.ISO_A3 || d.id;
         const cd = countryData[iso3];
         // Use a darker version of the region color for the outline
-        const c = d3.color(REGION_COLORS[cd.region] || "#0071bc");
+        const c = d3.color(REGION_COLORS[cd.region] || "#1a3a5c");
         return c.darker(0.5).toString();
       })
       .attr("stroke-width", 2.5);

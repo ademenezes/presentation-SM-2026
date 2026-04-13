@@ -17,84 +17,209 @@ format:
     embed-resources: false
     include-in-header:
       text: |
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
-        <script src="https://cdn.jsdelivr.net/npm/plotly.js@2/dist/plotly.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/flubber@0.4.2/build/flubber.min.js"></script>
 ---
 
-## {#title-custom .title-slide data-background-color="#f7f8fa"}
+## {#title-custom .title-slide data-background-color="#f8f5f0"}
 
 ```{=html}
-<div class="divider" style="width:80px; height:5px; margin-bottom:1.2em;"></div>
-<h1 style="font-size:3.5em; font-weight:900; letter-spacing:-0.03em; color:#0071bc; margin-bottom: 0.2em;">Water Services<br>in Transition</h1>
-<div style="font-size:1.6em; color:#4a5568; font-weight:300; margin-top:0.5em;">From Crisis to Smart Investment</div>
-<div style="font-size:1em; color:#8898aa; margin-top:2em;">World Bank Water Global Practice</div>
-<div style="font-size:0.85em; color:#8898aa; margin-top:0.5em;">Spring Meetings 2026</div>
-```
-
-
-<!-- ═══════════════════════════════════════════════════════════
-     SCENE 2: TRIPLE BURDEN — WATER (map → chart morph)
-     ═══════════════════════════════════════════════════════════ -->
-
-## {#triple-burden-water}
-
-### The Triple Burden — Water
-
-Billions face overlapping **poverty**, **flood risk**, and **inadequate access** — often all at once.
-
-```{=html}
-<div id="tb-morph-water" style="width:100%; height:78vh; position:relative;"></div>
-<p class="fragment" data-fragment-index="0" style="display:none;">trigger</p>
-```
-
-::: {.source}
-Source: World Bank Triple Burden Analysis (2025) &nbsp;|&nbsp; ADM2-level, 130+ countries
-:::
-
-
-<!-- ═══════════════════════════════════════════════════════════
-     SCENE 3: TRIPLE BURDEN — SANITATION (map → chart morph)
-     ═══════════════════════════════════════════════════════════ -->
-
-## {#triple-burden-sanitation}
-
-### The Triple Burden — Sanitation
-
-**49% of Sub-Saharan Africa** faces all three burdens — poverty, flood risk, and inadequate sanitation.
-
-```{=html}
-<div id="tb-morph-sanitation" style="width:100%; height:78vh; position:relative;"></div>
-<p class="fragment" data-fragment-index="0" style="display:none;">trigger</p>
-```
-
-::: {.source}
-Source: World Bank Triple Burden Analysis (2025) &nbsp;|&nbsp; ADM2-level, 130+ countries
-:::
-
-
-<!-- ═══════════════════════════════════════════════════════════
-     SCENE 3b: TRIPLE BURDEN — INCOME GROUPS
-     ═══════════════════════════════════════════════════════════ -->
-
-## {#triple-burden-income}
-
-### The Triple Burden by Income Group
-
-The poorest countries carry the heaviest weight — **37% of LIC populations** face all three burdens.
-
-```{=html}
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:40px; height:68vh;">
-  <div>
-    <div style="text-align:center; font-weight:600; color:var(--text-secondary); font-size:1.1em; margin-bottom:8px;">Water</div>
-    <div id="tb-income-water" class="chart-container" style="height:58vh;"></div>
+<div class="title-cover" style="display:flex; flex-direction:column; align-items:flex-start; justify-content:center; height:100%; padding:0 60px;">
+  <!-- WB Group Logo -->
+  <div style="margin-bottom:2.5em;">
+    <img src="images/wb-group-logo.svg" alt="World Bank Group" style="height:48px; opacity:0.85;" />
   </div>
-  <div>
-    <div style="text-align:center; font-weight:600; color:var(--text-secondary); font-size:1.1em; margin-bottom:8px;">Sanitation</div>
-    <div id="tb-income-sanitation" class="chart-container" style="height:58vh;"></div>
+  <!-- Decorative accent line -->
+  <div style="width:100px; height:5px; background: linear-gradient(90deg, #8b1a2d, #b85c70); margin-bottom:1.8em; border-radius:3px;"></div>
+  <!-- Main title -->
+  <h1 style="font-size:4em; font-weight:900; letter-spacing:-0.03em; color:#8b1a2d; margin:0 0 0.15em 0; line-height:1.05; font-family:'Playfair Display', Georgia, serif;">Water Services<br>in Transition</h1>
+  <!-- Subtitle -->
+  <div style="font-size:1.7em; color:#1a3a5c; font-weight:700; margin-top:0.4em; font-family:'Playfair Display', Georgia, serif; letter-spacing:-0.01em;">From Crisis to Smart Investment</div>
+  <!-- Thin separator -->
+  <div style="width:60px; height:2px; background:#c8d8e4; margin:1.8em 0;"></div>
+  <!-- Department & Event -->
+  <div style="font-size:1.05em; color:#4a5568; font-weight:600; font-family:'Nunito', sans-serif;">World Bank Group &mdash; Global Water Department</div>
+  <div style="font-size:0.9em; color:#6b7280; margin-top:0.6em; font-family:'Nunito', sans-serif; letter-spacing:0.04em;">Spring Meetings &nbsp;&bull;&nbsp; April 2026</div>
+</div>
+```
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 1b: THE SCALE OF THE CRISIS — Animated Infographic
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#water-crisis-scale data-background-image="images/water-bg.svg" data-background-size="cover"}
+
+```{=html}
+<div class="crisis-grid crisis-grid-dark">
+
+  <div class="crisis-stat fragment fade-up" data-fragment-index="0">
+    <svg class="crisis-icon" viewBox="0 0 32 32" width="28" height="28"><path d="M16 3 C16 3 6 16 6 22 C6 27.5 10.5 30 16 30 C21.5 30 26 27.5 26 22 C26 16 16 3 16 3Z" fill="none" stroke="#d4909e" stroke-width="2" stroke-linecap="round"/></svg>
+    <div class="crisis-accent"></div>
+    <div class="crisis-value"><span class="info-number" data-counter="4" data-suffix=" billion">0</span></div>
+    <div class="crisis-desc">people live in water-scarce areas</div>
+    <div class="crisis-sub"><strong>1 in 4</strong> cities face water insecurity</div>
+  </div>
+
+  <div class="crisis-stat fragment fade-up" data-fragment-index="1">
+    <svg class="crisis-icon" viewBox="0 0 32 32" width="28" height="28"><path d="M10 8 L10 18 C10 23 13 26 18 26 L18 26" fill="none" stroke="#d4909e" stroke-width="2" stroke-linecap="round"/><circle cx="18" cy="26" r="2" fill="#d4909e"/><path d="M6 12 L14 12" stroke="#d4909e" stroke-width="2" stroke-linecap="round"/><path d="M20 14 L20 10 M20 10 L17 13 M20 10 L23 13" fill="none" stroke="#c8d8e4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="crisis-accent"></div>
+    <div class="crisis-value"><span class="info-number" data-counter="2100" data-display="2.1 billion" data-suffix="">0</span></div>
+    <div class="crisis-desc">lack safely managed water supply</div>
+    <div class="crisis-sub">1 in 4 people worldwide</div>
+  </div>
+
+  <div class="crisis-stat fragment fade-up" data-fragment-index="2">
+    <svg class="crisis-icon" viewBox="0 0 32 32" width="28" height="28"><rect x="8" y="6" width="16" height="20" rx="2" fill="none" stroke="#d4909e" stroke-width="2"/><line x1="16" y1="6" x2="16" y2="26" stroke="#d4909e" stroke-width="1.5"/><circle cx="16" cy="16" r="3" fill="none" stroke="#c8d8e4" stroke-width="1.5"/></svg>
+    <div class="crisis-accent"></div>
+    <div class="crisis-value"><span class="info-number" data-counter="3400" data-display="3.4 billion" data-suffix="">0</span></div>
+    <div class="crisis-desc">lack safely managed sanitation</div>
+    <div class="crisis-sub">42% of the global population</div>
+  </div>
+
+  <div class="crisis-stat fragment fade-up" data-fragment-index="3">
+    <svg class="crisis-icon" viewBox="0 0 32 32" width="28" height="28"><circle cx="16" cy="16" r="12" fill="none" stroke="#d4909e" stroke-width="2"/><line x1="16" y1="16" x2="16" y2="8" stroke="#d4909e" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="16" x2="22" y2="18" stroke="#c8d8e4" stroke-width="1.5" stroke-linecap="round"/><circle cx="16" cy="16" r="1.5" fill="#d4909e"/></svg>
+    <div class="crisis-accent"></div>
+    <div class="crisis-value">Every <span class="info-number info-number-inline" data-counter="100" data-suffix=" seconds">0</span></div>
+    <div class="crisis-desc">a child dies from diarrhoea linked to</div>
+    <div class="crisis-sub">inadequate water and sanitation</div>
+  </div>
+
+</div>
+```
+
+::: {.source .source-light}
+Source: WHO/UNICEF JMP (2025), World Bank
+:::
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 1c: TRIPLE BURDEN CONCEPT — Converging Circles
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#triple-burden-concept data-background-color="#f8f5f0"}
+
+### The Triple Burden
+
+```{=html}
+<div id="tb-layout" style="position:relative; height:820px; overflow:hidden;">
+  <!-- Venn diagram — starts centered, slides left on fragment -->
+  <div id="tb-venn" class="tb-venn-centered" style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; transition: transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);">
+  <svg viewBox="0 0 900 650" width="100%" height="100%" style="max-width:1300px;">
+    <defs>
+      <linearGradient id="grad-climate" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2e6da4" stop-opacity="0.8"/>
+        <stop offset="100%" stop-color="#1a3a5c" stop-opacity="0.9"/>
+      </linearGradient>
+      <linearGradient id="grad-poverty" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#b85c70" stop-opacity="0.8"/>
+        <stop offset="100%" stop-color="#8b1a2d" stop-opacity="0.9"/>
+      </linearGradient>
+      <linearGradient id="grad-sanitation" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#6699cc" stop-opacity="0.8"/>
+        <stop offset="100%" stop-color="#2e6da4" stop-opacity="0.9"/>
+      </linearGradient>
+      <radialGradient id="grad-center">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.3"/>
+        <stop offset="50%" stop-color="#8b1a2d" stop-opacity="0.6"/>
+        <stop offset="100%" stop-color="#5a1020" stop-opacity="0.85"/>
+      </radialGradient>
+    </defs>
+
+    <!-- Three converging circles -->
+    <circle class="tb-circle tb-circle-1" cx="290" cy="195" r="185" fill="url(#grad-climate)" opacity="0.7"/>
+    <circle class="tb-circle tb-circle-2" cx="610" cy="195" r="185" fill="url(#grad-poverty)" opacity="0.7"/>
+    <circle class="tb-circle tb-circle-3" cx="450" cy="420" r="185" fill="url(#grad-sanitation)" opacity="0.7"/>
+
+    <!-- Center convergence -->
+    <circle class="tb-center" cx="450" cy="275" r="50" fill="url(#grad-center)" stroke="#ffffff" stroke-width="2.5"/>
+
+    <!-- Dashed flow lines -->
+    <path class="tb-flow tb-flow-1" d="M 290 195 Q 370 230 450 275" stroke="#1a3a5c" stroke-width="2.5" fill="none" stroke-dasharray="6,4"/>
+    <path class="tb-flow tb-flow-2" d="M 610 195 Q 530 230 450 275" stroke="#8b1a2d" stroke-width="2.5" fill="none" stroke-dasharray="6,4"/>
+    <path class="tb-flow tb-flow-3" d="M 450 420 Q 450 345 450 275" stroke="#2e6da4" stroke-width="2.5" fill="none" stroke-dasharray="6,4"/>
+
+    <!-- Circle labels — centered at each circle's center -->
+    <g class="tb-label tb-label-1">
+      <text x="290" y="188" text-anchor="middle" fill="#ffffff" font-size="26" font-weight="700" font-family="-apple-system, sans-serif">High Climate Risk</text>
+      <text x="290" y="216" text-anchor="middle" fill="rgba(255,255,255,0.85)" font-size="17" font-style="italic" font-family="-apple-system, sans-serif">Droughts &amp; floods</text>
+    </g>
+    <g class="tb-label tb-label-2">
+      <text x="610" y="195" text-anchor="middle" fill="#ffffff" font-size="26" font-weight="700" font-family="-apple-system, sans-serif">High Poverty</text>
+    </g>
+    <g class="tb-label tb-label-3">
+      <text x="450" y="410" text-anchor="middle" fill="#ffffff" font-size="24" font-weight="700" font-family="-apple-system, sans-serif">Low Access to Water &amp;</text>
+      <text x="450" y="440" text-anchor="middle" fill="#ffffff" font-size="24" font-weight="700" font-family="-apple-system, sans-serif">Sanitation Services</text>
+    </g>
+
+    <!-- Center text -->
+    <g class="tb-center-text">
+      <text x="450" y="268" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="700" font-family="-apple-system, sans-serif" letter-spacing="2">TRIPLE</text>
+      <text x="450" y="294" text-anchor="middle" fill="#e8b4c0" font-size="20" font-weight="700" font-family="-apple-system, sans-serif" letter-spacing="2">BURDEN</text>
+    </g>
+  </svg>
+  </div>
+
+  <!-- Explainer text (right side, hidden initially) -->
+  <div id="tb-explainer" style="position:absolute; top:0; left:56%; width:41%; height:100%; display:flex; flex-direction:column; justify-content:center; padding:40px 40px 40px 0; opacity:0; transform:translateX(40px); transition: opacity 0.8s 0.6s ease-out, transform 0.8s 0.6s ease-out;">
+    <div class="fragment fade-up" data-fragment-index="0" style="margin-bottom:1.2em;">
+      <div style="font-size:1.6em; font-weight:700; color:#8b1a2d; line-height:1.2; font-family:'Playfair Display', Georgia, serif;">Areas experiencing the Triple Burden are the most vulnerable</div>
+    </div>
+    <div class="fragment fade-up" data-fragment-index="1" style="margin-bottom:1.2em; padding-left:1.2em; border-left:4px solid #b85c70;">
+      <p style="font-size:1.2em; color:#4a5568; line-height:1.5; margin:0;">Poor water and sanitation access combined with poverty creates a <strong style="color:#1a3a5c;">poverty trap</strong> &mdash; increasing mortality, stalling human capital, and reducing earnings across generations.</p>
+    </div>
+    <div class="fragment fade-up" data-fragment-index="2" style="padding-left:1.2em; border-left:4px solid #2e6da4;">
+      <p style="font-size:1.2em; color:#4a5568; line-height:1.5; margin:0;">Those trapped are <strong style="color:#1a3a5c;">less resilient to climate shocks</strong>. Water infrastructure is vulnerable to droughts and floods, while poor sanitation generates emissions that worsen climate risks.</p>
+    </div>
   </div>
 </div>
+
+<script>
+// Venn slide-left on fragment reveal
+(function() {
+  function setupFragmentListeners() {
+    if (typeof Reveal === 'undefined') return;
+    // TB Venn slide-left
+    Reveal.on('fragmentshown', function(ev) {
+      if (ev.fragment.closest && ev.fragment.closest('#tb-layout')) {
+        document.getElementById('tb-venn').classList.replace('tb-venn-centered', 'tb-venn-shifted');
+        document.getElementById('tb-explainer').classList.add('tb-explainer-visible');
+      }
+      // World line trigger on tariff charts
+      if (ev.fragment.classList.contains('world-line-trigger')) {
+        var chartId = ev.fragment.getAttribute('data-chart');
+        var container = document.getElementById(chartId);
+        if (container && container._showWorldLine) container._showWorldLine();
+      }
+    });
+    Reveal.on('fragmenthidden', function(ev) {
+      if (ev.fragment.closest && ev.fragment.closest('#tb-layout')) {
+        var remaining = document.querySelectorAll('#tb-layout .fragment.visible');
+        if (remaining.length === 0) {
+          document.getElementById('tb-venn').classList.replace('tb-venn-shifted', 'tb-venn-centered');
+          document.getElementById('tb-explainer').classList.remove('tb-explainer-visible');
+        }
+      }
+      // Hide World line
+      if (ev.fragment.classList.contains('world-line-trigger')) {
+        var chartId = ev.fragment.getAttribute('data-chart');
+        var container = document.getElementById(chartId);
+        if (container && container._hideWorldLine) container._hideWorldLine();
+      }
+    });
+  }
+  if (typeof Reveal !== 'undefined' && Reveal.isReady && Reveal.isReady()) {
+    setupFragmentListeners();
+  } else if (typeof Reveal !== 'undefined') {
+    Reveal.on('ready', setupFragmentListeners);
+  } else {
+    document.addEventListener('DOMContentLoaded', function() { setTimeout(setupFragmentListeners, 500); });
+  }
+})();
+</script>
 ```
 
 ::: {.source}
@@ -103,80 +228,66 @@ Source: World Bank Triple Burden Analysis (2025)
 
 
 <!-- ═══════════════════════════════════════════════════════════
-     SCENE 4: SPENDING TREND
+     SCENE 2: TRIPLE BURDEN — WATER MAP
      ═══════════════════════════════════════════════════════════ -->
 
-## {#spending-trend}
+## {#triple-burden-water}
 
-### Spending Is Rising
+### In developing countries, 1.1 billion people (17.4%) live under high poverty, high risk of droughts, and low access to water services
 
-The good news: global water sector spending has been increasing.
+```{=html}
+<div id="tb-map-water" style="width:100%; height:840px; position:relative;"></div>
+```
 
-::: {.chart-full}
-<div style="display:flex; justify-content:center; align-items:center; height:100%; color: var(--text-muted); font-size:1.5em; background: var(--bg-secondary); border-radius: 12px;">
-World Sector Spending Trend<br>
-<span style="font-size:0.6em;">(Chart to be extracted from FWSF dashboard)</span>
-</div>
-:::
 
-::: {.source}
-Source: Funding a Water-Secure Future (fwsf.wbwaterdata.org)
-:::
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCENE 3: TRIPLE BURDEN — SANITATION MAP
+     ═══════════════════════════════════════════════════════════ -->
+
+## {#triple-burden-sanitation}
+
+### 1.1 billion people live under high poverty, high risk of flooding, and low access to sanitation services
+
+```{=html}
+<div id="tb-map-sanitation" style="width:100%; height:840px; position:relative;"></div>
+```
 
 
 <!-- ═══════════════════════════════════════════════════════════
      SCENE 5: SPENDING GAP
      ═══════════════════════════════════════════════════════════ -->
 
-## {#spending-gap}
-
-### ...But Not Fast Enough
-
-The gap between what we spend and what's needed remains enormous.
-
-::: {.chart-full}
-<div style="display:flex; justify-content:center; align-items:center; height:100%; color: var(--text-muted); font-size:1.5em; background: var(--bg-secondary); border-radius: 12px;">
-Spending Gap Visualization<br>
-<span style="font-size:0.6em;">(Chart to be extracted from FWSF dashboard)</span>
-</div>
-:::
-
-::: {.source}
-Source: Funding a Water-Secure Future (fwsf.wbwaterdata.org)
-:::
+## {#spending-gap .iframe-slide background-color="#f8f5f0" background-iframe="https://spending-gaps-standalone.replit.app/" background-interactive="true"}
 
 
-<!-- ═══════════════════════════════════════════════════════════
-     SCENE 6: COVERAGE MAP
-     ═══════════════════════════════════════════════════════════ -->
-
-## {#coverage data-background-color="#f7f8fa"}
-
-### Unprecedented Data Coverage
+## {#budget-execution .iframe-slide background-color="#f8f5f0" background-iframe="https://budget-execution-standalone.replit.app/" background-interactive="true"}
 
 ```{=html}
-<p style="color: var(--text-secondary); font-size: 1.05em; margin-bottom: 24px;">For the first time, we can see how utilities perform across the developing world — regulatory data from <strong>32 countries</strong>.</p>
-
-<div class="metric-row">
-  <div class="metric-card">
-    <span class="metric-value" data-counter="33509">0</span>
-    <span class="metric-label">Utilities</span>
-  </div>
-  <div class="metric-card">
-    <span class="metric-value" data-counter="32" data-suffix="+">0</span>
-    <span class="metric-label">Countries</span>
-  </div>
-  <div class="metric-card">
-    <span class="metric-value" data-counter="3" data-suffix="M+">0</span>
-    <span class="metric-label">Observations</span>
-  </div>
-</div>
-<div id="coverage-map" class="chart-container" style="height: 550px; width: 100%;"></div>
+<script>
+// Inject cover elements over iframe top borders
+(function() {
+  function addCovers() {
+    document.querySelectorAll('.slide-background-content').forEach(function(el) {
+      if (el.querySelector('iframe') && !el.querySelector('.iframe-border-cover')) {
+        var cover = document.createElement('div');
+        cover.className = 'iframe-border-cover';
+        el.appendChild(cover);
+      }
+    });
+  }
+  if (typeof Reveal !== 'undefined') {
+    if (Reveal.isReady && Reveal.isReady()) { setTimeout(addCovers, 1000); }
+    else { Reveal.on('ready', function() { setTimeout(addCovers, 1000); }); }
+  } else {
+    document.addEventListener('DOMContentLoaded', function() { setTimeout(addCovers, 2000); });
+  }
+})();
+</script>
 ```
 
-::: {.source}
-Source: IBNET, Regulators Performance Database, World Bank
-:::
+
 
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -187,6 +298,19 @@ Source: IBNET, Regulators Performance Database, World Bank
 
 ```{=html}
 <div id="hero-chart-tariffs" class="hero-chart-container chart-full"></div>
+<div class="fragment world-line-trigger" data-fragment-index="0" data-chart="hero-chart-tariffs"></div>
+```
+
+::: {.source}
+Source: IBNET Tariff Portal, PPP-adjusted (World Bank)
+:::
+
+
+## {#tariffs-nominal data-background-color="#ffffff"}
+
+```{=html}
+<div id="hero-chart-tariffs-nominal" class="hero-chart-container chart-full"></div>
+<div class="fragment world-line-trigger" data-fragment-index="0" data-chart="hero-chart-tariffs-nominal"></div>
 ```
 
 ::: {.source}
@@ -224,48 +348,41 @@ Source: Regulators Performance Database, IBNET
 :::
 
 
+
+
+
+
 <!-- ═══════════════════════════════════════════════════════════
-     SCENE 10: COST COVERAGE — Hero Chart State 4
+     SCENE 12: CONTINENTAL DRYING — FRESHWATER LOSS
      ═══════════════════════════════════════════════════════════ -->
 
-## {#cost-coverage data-background-color="#ffffff"}
+## {#freshwater-loss}
+
+### The Drying Continent
+
+The planet is losing freshwater to the oceans at an accelerating rate.
 
 ```{=html}
-<div id="hero-chart-cost-coverage" class="hero-chart-container chart-full"></div>
+<div id="chart-freshwater-loss" class="chart-container" style="height: 65vh;"></div>
 ```
 
 ::: {.source}
-Source: Regulators Performance Database, IBNET
+Source: GRACE/GRACE-FO satellite data; Continental Drying — A Threat to Our Common Future, World Bank
 :::
 
 
 <!-- ═══════════════════════════════════════════════════════════
-     SCENE 11: THE PARADOX — Tariffs Up, But NRW Worsening
-     ═══════════════════════════════════════════════════════════ -->
-
-## {#paradox data-background-color="#ffffff"}
-
-```{=html}
-<div id="hero-chart-paradox" class="hero-chart-container chart-full"></div>
-```
-
-::: {.source}
-Source: IBNET Tariff Portal, Regulators Performance Database
-:::
-
-
-<!-- ═══════════════════════════════════════════════════════════
-     SCENE 12: CONTINENTAL DRYING — LAND USE
+     SCENE 13: CONTINENTAL DRYING — LAND USE
      ═══════════════════════════════════════════════════════════ -->
 
 ## {#land-use-tws}
 
-### The Water-Energy-Land Nexus
+### What's Driving the Loss?
 
-Deforestation and agricultural expansion are draining freshwater reserves.
+Urban expansion and irrigation have the largest negative impact on water storage.
 
 ```{=html}
-<div id="chart-land-use-tws" class="chart-container" style="height: 65vh;"></div>
+<div id="chart-land-use-tws" class="chart-container" style="height: 82vh; overflow: visible;"></div>
 ```
 
 ::: {.source}
@@ -274,17 +391,17 @@ Source: Continental Drying — A Threat to Our Common Future, World Bank
 
 
 <!-- ═══════════════════════════════════════════════════════════
-     SCENE 13: CONTINENTAL DRYING — ENERGY
+     SCENE 14: CONTINENTAL DRYING — ENERGY
      ═══════════════════════════════════════════════════════════ -->
 
 ## {#energy-tws}
 
-### As Water Becomes Scarcer, Energy Costs Rise
+### The Energy Pricing Lever
 
-A vicious cycle that policy can break.
+Cheap energy subsidizes groundwater pumping — pricing it correctly conserves water.
 
 ```{=html}
-<div id="chart-energy-tws" class="chart-container" style="height: 65vh;"></div>
+<div id="chart-energy-tws" class="chart-container" style="height: 82vh; overflow: visible;"></div>
 ```
 
 ::: {.source}
@@ -292,32 +409,38 @@ Source: Continental Drying — A Threat to Our Common Future, World Bank
 :::
 
 
-<!-- ═══════════════════════════════════════════════════════════
-     SCENE 14: CALL TO ACTION
-     ═══════════════════════════════════════════════════════════ -->
-
-## {#call-to-action data-background-color="#f7f8fa"}
-
-### Where Investment Pays Off
-
-```{=html}
-<div class="divider"></div>
-<ul class="policy-points">
-  <li><span class="highlight">Target the triple burden</span> — prioritize the 1.2 billion people facing overlapping poverty, flood risk, and inadequate access.</li>
-  <li><span class="highlight">Metering</span> — you can't manage what you don't measure. Expanding meters reduces NRW and improves billing.</li>
-  <li><span class="highlight">Tariff reform</span> — real tariffs must keep pace with costs. Transparent, affordable pricing builds public trust.</li>
-  <li><span class="highlight">NRW reduction</span> — every litre saved is a litre that doesn't need to be produced, treated, and pumped.</li>
-  <li><span class="highlight">Data-driven regulation</span> — with 33,000+ utilities in the evidence base, we now know <em>where</em> to invest and <em>what works</em>.</li>
-</ul>
-```
 
 
 <!-- ═══════════════════════════════════════════════════════════
      SCRIPTS (loaded at end for performance)
      ═══════════════════════════════════════════════════════════ -->
 
-<script src="scripts/main.js"></script>
-<script src="scripts/hero-chart.js"></script>
+<script src="scripts/main.js?v=5"></script>
+<script src="scripts/hero-chart.js?v=5"></script>
 <script src="scripts/coverage-map.js"></script>
-<script src="scripts/three-d-chart.js"></script>
-<script src="scripts/tb-chart.js"></script>
+<script src="scripts/cd-chart.js?v=3"></script>
+<script src="scripts/tb-chart.js?v=5"></script>
+<script>
+// Robust hero chart dispatch — runs after all scripts load
+(function() {
+  function setup() {
+    Reveal.on('slidechanged', function(ev) {
+      var id = ev.currentSlide.id || '';
+      if (typeof HERO_SLIDES !== 'undefined' && HERO_SLIDES.indexOf(id) !== -1) {
+        document.dispatchEvent(new CustomEvent('hero-morph', { detail: { state: id } }));
+      }
+    });
+    // Also fire for the current slide in case we missed the initial slidechanged
+    var curr = Reveal.getCurrentSlide();
+    if (curr) {
+      var id = curr.id || '';
+      if (typeof HERO_SLIDES !== 'undefined' && HERO_SLIDES.indexOf(id) !== -1) {
+        document.dispatchEvent(new CustomEvent('hero-morph', { detail: { state: id } }));
+      }
+    }
+  }
+  if (typeof Reveal !== 'undefined' && Reveal.isReady()) setup();
+  else if (typeof Reveal !== 'undefined') Reveal.on('ready', setup);
+  else document.addEventListener('DOMContentLoaded', function() { setTimeout(setup, 500); });
+})();
+</script>

@@ -15,31 +15,31 @@
   const TRANSITION_MS = 1200;
 
   const REGION_COLORS = {
-    "Sub-Saharan Africa": "#e8553a",
-    "East Asia & Pacific": "#0071bc",
-    "Europe & Central Asia": "#6c4fa0",
-    "Latin America & Caribbean": "#2b9f93",
-    "Middle East, North Africa, Afghanistan & Pakistan": "#d4a017",
-    "South Asia": "#c7365f",
+    "Sub-Saharan Africa": "#8b1a2d",
+    "East Asia and Pacific": "#2e6da4",
+    "Europe and Central Asia": "#6699cc",
+    "Latin America and the Caribbean": "#d4909e",
+    "Middle East, North Africa, Afghanistan and Pakistan": "#b85c70",
+    "South Asia": "#1a3a5c",
     "Global": "#9ca3af",
   };
 
   const REGION_SHORT = {
     "Sub-Saharan Africa": "SSA",
-    "East Asia & Pacific": "EAP",
-    "Europe & Central Asia": "ECA",
-    "Latin America & Caribbean": "LAC",
-    "Middle East, North Africa, Afghanistan & Pakistan": "MENA",
+    "East Asia and Pacific": "EAP",
+    "Europe and Central Asia": "ECA",
+    "Latin America and the Caribbean": "LAC",
+    "Middle East, North Africa, Afghanistan and Pakistan": "MENAAP",
     "South Asia": "SAR",
     "Global": "Global",
   };
 
   const REGION_FULL = {
     "Sub-Saharan Africa": "Sub-Saharan Africa",
-    "East Asia & Pacific": "East Asia & Pacific",
-    "Europe & Central Asia": "Europe & Central Asia",
-    "Latin America & Caribbean": "Latin America",
-    "Middle East, North Africa, Afghanistan & Pakistan": "MENA",
+    "East Asia and Pacific": "East Asia and Pacific",
+    "Europe and Central Asia": "Europe and Central Asia",
+    "Latin America and the Caribbean": "Latin America",
+    "Middle East, North Africa, Afghanistan and Pakistan": "MENAAP",
     "South Asia": "South Asia",
   };
 
@@ -51,14 +51,15 @@
   let datasets = {};
 
   async function loadData() {
-    const [tariffs, nrw, metering, costCov, coverageMap] = await Promise.all([
-      fetch("data/timeseries.json").then((r) => r.json()),
+    const [tariffs, tariffsNominal, nrw, metering, costCov, coverageMap] = await Promise.all([
+      fetch("data/timeseries.json?v=2").then((r) => r.json()),
+      fetch("data/timeseries_nominal.json?v=1").then((r) => r.json()),
       fetch("data/nrw_trends.json").then((r) => r.json()),
       fetch("data/metering_trends.json").then((r) => r.json()),
       fetch("data/cost_coverage_trends.json").then((r) => r.json()),
       fetch("data/coverage_map.json").then((r) => r.json()),
     ]);
-    datasets = { tariffs, nrw, metering, "cost-coverage": costCov, coverageMap };
+    datasets = { tariffs, "tariffs-nominal": tariffsNominal, nrw, metering, "cost-coverage": costCov, coverageMap };
   }
 
   function getDimensions() {
@@ -73,109 +74,169 @@
   }
 
   // ═══════════════════════════════════════════════════════════
-  // TARIFFS — Animated line chart with spotlight
+  // TARIFFS — Shared renderer for PPP and Nominal
   // ═══════════════════════════════════════════════════════════
-  function renderTariffs() {
-    const container = document.getElementById("hero-chart-tariffs");
-    if (!container) return;
-    const data = datasets.tariffs;
-    if (!data) return;
+  function renderTariffChart(containerId, data, opts) {
+    const container = document.getElementById(containerId);
+    if (!container || !data) return;
 
     const { W, H } = getDimensions();
-    const MARGIN = { top: 90, right: 200, bottom: 80, left: 90 };
+    const MARGIN = { top: 100, right: 210, bottom: 80, left: 100 };
     container.innerHTML = "";
     const width = W - MARGIN.left - MARGIN.right;
     const height = H - MARGIN.top - MARGIN.bottom;
+    const ANIM = 2000; // slower animation
 
     const svg = d3.select(container).append("svg").attr("width", W).attr("height", H);
     const g = svg.append("g").attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
 
     const regions = Object.keys(data).filter(r => r !== "Global");
     const lineData = regions.map(region => ({
-      region,
-      color: REGION_COLORS[region] || "#888",
-      short: REGION_SHORT[region],
-      values: (data[region] || [])
-        .map(d => ({ year: d.year, value: d.median15m3 }))
-        .filter(d => d.value != null && !isNaN(d.value) && d.year <= 2024),
+      region, color: REGION_COLORS[region] || "#888", short: REGION_SHORT[region],
+      values: (data[region] || []).map(d => ({ year: d.year, value: d.median15m3 }))
+        .filter(d => d.value != null && !isNaN(d.value) && d.year >= 2016 && d.year <= 2024),
     })).filter(d => d.values.length >= 2);
+
+    const globalData = (data["Global"] || []).map(d => ({ year: d.year, value: d.median15m3 }))
+      .filter(d => d.value != null && !isNaN(d.value) && d.year >= 2016 && d.year <= 2024);
 
     let allYears = [];
     lineData.forEach(d => d.values.forEach(v => allYears.push(v.year)));
-    const xScale = d3.scaleLinear().domain([d3.min(allYears), d3.max(allYears)]).range([0, width]);
-    const yScale = d3.scaleLinear().domain([0, 50]).range([height, 0]);
+    if (globalData.length) globalData.forEach(v => allYears.push(v.year));
+    const xScale = d3.scaleLinear().domain([2016, 2024]).range([0, width]);
+    const yScale = d3.scaleLinear().domain([0, opts.yMax]).range([height, 0]);
 
     // Grid
     g.append("g").selectAll("line").data(yScale.ticks(5)).enter()
       .append("line").attr("x1", 0).attr("x2", width)
-      .attr("y1", d => yScale(d)).attr("y2", d => yScale(d))
-      .attr("stroke", "rgba(0,0,0,0.06)");
+      .attr("y1", d => yScale(d)).attr("y2", d => yScale(d)).attr("stroke", "rgba(0,0,0,0.06)");
 
-    // Axes
+    // Axes — bigger fonts
     g.append("g").attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(xScale).tickFormat(d3.format("d")).ticks(8))
-      .selectAll("text").attr("fill", "#8898aa").attr("font-size", "14px");
+      .selectAll("text").attr("fill", "#6b7280").attr("font-size", "20px");
     g.append("g").call(d3.axisLeft(yScale).ticks(6))
-      .selectAll("text").attr("fill", "#8898aa").attr("font-size", "14px");
+      .selectAll("text").attr("fill", "#6b7280").attr("font-size", "20px");
     g.selectAll(".domain").remove();
     g.selectAll(".tick line").attr("stroke", "rgba(0,0,0,0.1)");
 
     // Y label
     g.append("text").attr("transform", "rotate(-90)")
-      .attr("x", -height / 2).attr("y", -60).attr("text-anchor", "middle")
-      .attr("fill", "#4a5568").attr("font-size", "15px").attr("font-weight", "500")
-      .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif").text("USD / 15 m\u00b3 (constant 2025)");
+      .attr("x", -height / 2).attr("y", -72).attr("text-anchor", "middle")
+      .attr("fill", "#4a5568").attr("font-size", "20px").attr("font-weight", "500")
+      .attr("font-family", "'Nunito', -apple-system, sans-serif").text(opts.yLabel);
 
-    // Title
-    svg.append("text").attr("x", MARGIN.left).attr("y", 32)
-      .attr("fill", "#1a1a2e").attr("font-size", "26px").attr("font-weight", "700")
-      .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif").text("Median Water Tariffs by Region");
-    svg.append("text").attr("x", MARGIN.left).attr("y", 58)
-      .attr("fill", "#4a5568").attr("font-size", "16px")
-      .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif").text("Tariffs have been rising \u2014 utilities ARE trying to recover costs");
+    // Title (main insight)
+    svg.append("text").attr("x", MARGIN.left).attr("y", 38)
+      .attr("fill", "#8b1a2d").attr("font-size", "36px").attr("font-weight", "900")
+      .attr("font-family", "'Playfair Display', Georgia, serif").text(opts.title);
+    // Notes line
+    svg.append("text").attr("x", MARGIN.left).attr("y", 72)
+      .attr("fill", "#4a5568").attr("font-size", "20px")
+      .attr("font-family", "'Nunito', -apple-system, sans-serif").text(opts.notes);
 
     const line = d3.line().x(d => xScale(d.year)).y(d => yScale(d.value)).curve(d3.curveMonotoneX);
 
-    // Sort for layering
-    const sortOrder = ["South Asia", "Middle East, North Africa, Afghanistan & Pakistan",
-      "Europe & Central Asia", "Latin America & Caribbean", "Sub-Saharan Africa", "East Asia & Pacific"];
+    const sortOrder = ["South Asia", "Middle East, North Africa, Afghanistan and Pakistan",
+      "Europe and Central Asia", "Latin America and the Caribbean", "Sub-Saharan Africa", "East Asia and Pacific"];
     lineData.sort((a, b) => sortOrder.indexOf(a.region) - sortOrder.indexOf(b.region));
+
+    // Track regional paths for fading
+    const regionPaths = [];
 
     lineData.forEach((series, i) => {
       const path = g.append("path").datum(series.values)
         .attr("fill", "none").attr("stroke", series.color)
-        .attr("stroke-width", 3).attr("stroke-linecap", "round").attr("d", line);
+        .attr("stroke-width", 4).attr("stroke-linecap", "round").attr("d", line);
+      regionPaths.push(path);
       const totalLength = path.node().getTotalLength();
       path.attr("stroke-dasharray", totalLength).attr("stroke-dashoffset", totalLength)
-        .transition().duration(TRANSITION_MS).delay(i * 120).ease(d3.easeCubicOut)
+        .transition().duration(ANIM).delay(i * 200).ease(d3.easeCubicOut)
         .attr("stroke-dashoffset", 0)
         .on("end", function () { d3.select(this).attr("stroke-dasharray", "none"); });
 
       const last = series.values[series.values.length - 1];
-      g.append("circle").attr("cx", xScale(last.year)).attr("cy", yScale(last.value))
-        .attr("r", 5).attr("fill", series.color).attr("stroke", "#fff").attr("stroke-width", 2)
-        .attr("opacity", 0).transition().duration(400).delay(TRANSITION_MS + i * 120).attr("opacity", 1);
-
-      g.append("text").attr("x", xScale(last.year) + 14).attr("y", yScale(last.value) - 2)
-        .attr("fill", series.color).attr("font-size", "13px").attr("font-weight", "600")
-        .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif").text(series.short)
-        .attr("opacity", 0).transition().duration(400).delay(TRANSITION_MS + i * 120 + 200).attr("opacity", 1);
-      g.append("text").attr("x", xScale(last.year) + 14).attr("y", yScale(last.value) + 14)
-        .attr("fill", series.color).attr("font-size", "12px").attr("font-weight", "400")
-        .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif").text("$" + last.value.toFixed(1))
-        .attr("opacity", 0).transition().duration(400).delay(TRANSITION_MS + i * 120 + 300).attr("opacity", 0.8);
+      const labelG = g.append("g").attr("class", "region-label").attr("opacity", 0);
+      labelG.append("circle").attr("cx", xScale(last.year)).attr("cy", yScale(last.value))
+        .attr("r", 7).attr("fill", series.color).attr("stroke", "#fff").attr("stroke-width", 2);
+      labelG.append("text").attr("x", xScale(last.year) + 16).attr("y", yScale(last.value) - 2)
+        .attr("fill", series.color).attr("font-size", "18px").attr("font-weight", "700")
+        .attr("font-family", "'Nunito', -apple-system, sans-serif").text(series.short);
+      labelG.append("text").attr("x", xScale(last.year) + 16).attr("y", yScale(last.value) + 18)
+        .attr("fill", series.color).attr("font-size", "16px").attr("font-weight", "500")
+        .attr("font-family", "'Nunito', -apple-system, sans-serif").text("$" + last.value.toFixed(0));
+      labelG.transition().duration(500).delay(ANIM + i * 200).attr("opacity", 1);
     });
 
-    // Spotlight annotation: gap callout
-    const insightG = svg.append("g")
-      .attr("transform", `translate(${MARGIN.left}, ${H - 55})`).attr("opacity", 0);
-    insightG.append("rect").attr("width", width * 0.65).attr("height", 36).attr("rx", 6)
-      .attr("fill", "#eef5fa").attr("stroke", "#0071bc").attr("stroke-width", 1).attr("stroke-opacity", 0.3);
-    insightG.append("text").attr("x", 14).attr("y", 23)
-      .attr("fill", "#1a1a2e").attr("font-size", "14px").attr("font-weight", "500")
-      .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
-      .text("38x gap between highest (East Asia: $43) and lowest (South Asia: $1) tariff regions");
-    insightG.transition().duration(600).delay(TRANSITION_MS + lineData.length * 120 + 400).attr("opacity", 1);
+    // Store World line elements (hidden until fragment triggers)
+    if (globalData.length >= 2) {
+      const globalLine = d3.line().x(d => xScale(d.year)).y(d => yScale(d.value)).curve(d3.curveMonotoneX);
+      const gPath = g.append("path").datum(globalData)
+        .attr("fill", "none").attr("stroke", "#1a3a5c")
+        .attr("stroke-width", 6).attr("stroke-linecap", "round").attr("d", globalLine)
+        .attr("opacity", 0);
+      const gLen = gPath.node().getTotalLength();
+      gPath.attr("stroke-dasharray", gLen).attr("stroke-dashoffset", gLen);
+
+      const gLast = globalData[globalData.length - 1];
+      const wLabelG = g.append("g").attr("opacity", 0);
+      wLabelG.append("circle").attr("cx", xScale(gLast.year)).attr("cy", yScale(gLast.value))
+        .attr("r", 9).attr("fill", "#1a3a5c").attr("stroke", "#fff").attr("stroke-width", 3);
+      wLabelG.append("text").attr("x", xScale(gLast.year) + 18).attr("y", yScale(gLast.value) - 6)
+        .attr("fill", "#1a3a5c").attr("font-size", "24px").attr("font-weight", "900")
+        .attr("font-family", "'Playfair Display', Georgia, serif").text("World Average");
+      wLabelG.append("text").attr("x", xScale(gLast.year) + 18).attr("y", yScale(gLast.value) + 20)
+        .attr("fill", "#1a3a5c").attr("font-size", "20px").attr("font-weight", "600")
+        .attr("font-family", "'Nunito', -apple-system, sans-serif").text("$" + gLast.value.toFixed(0));
+
+      // Store reveal function on the container for fragment triggering
+      container._showWorldLine = function () {
+        // Fade regional lines
+        regionPaths.forEach(function (p) {
+          p.transition().duration(800).attr("stroke-opacity", 0.3);
+        });
+        g.selectAll(".region-label").each(function () {
+          d3.select(this).transition().duration(800).attr("opacity", 0.35);
+        });
+        // Draw World line
+        gPath.transition().delay(600).duration(ANIM)
+          .attr("opacity", 1).attr("stroke-dashoffset", 0)
+          .ease(d3.easeCubicOut)
+          .on("end", function () { d3.select(this).attr("stroke-dasharray", "none"); });
+        wLabelG.transition().delay(600 + ANIM).duration(500).attr("opacity", 1);
+      };
+      container._hideWorldLine = function () {
+        // Restore regional lines
+        regionPaths.forEach(function (p) {
+          p.transition().duration(600).attr("stroke-opacity", 1);
+        });
+        g.selectAll(".region-label").each(function () {
+          d3.select(this).transition().duration(600).attr("opacity", 1);
+        });
+        // Hide World line
+        gPath.transition().duration(400).attr("opacity", 0)
+          .on("end", function () { d3.select(this).attr("stroke-dashoffset", gLen); });
+        wLabelG.transition().duration(400).attr("opacity", 0);
+      };
+    }
+  }
+
+  function renderTariffs() {
+    renderTariffChart("hero-chart-tariffs", datasets.tariffs, {
+      yMax: 55,
+      yLabel: "PPP USD / 15 m\u00b3",
+      title: "Water Is More Expensive Than It Looks",
+      notes: "Median tariffs by region, PPP-adjusted (World Bank) \u00b7 3-year rolling median \u00b7 2016\u20132024",
+    });
+  }
+
+  function renderTariffsNominal() {
+    renderTariffChart("hero-chart-tariffs-nominal", datasets["tariffs-nominal"], {
+      yMax: 50,
+      yLabel: "USD / 15 m\u00b3 (constant 2025)",
+      title: "Tariffs Are Rising, But Still Insufficient",
+      notes: "Median tariffs by region, constant 2025 USD (not PPP-adjusted) \u00b7 3-year rolling median \u00b7 2016\u20132024",
+    });
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -185,7 +246,7 @@
     const container = document.getElementById("hero-chart-nrw");
     if (!container) return;
     const { W, H } = getDimensions();
-    const MARGIN = { top: 100, right: 60, bottom: 90, left: 100 };
+    const MARGIN = { top: 100, right: 80, bottom: 90, left: 100 };
     container.innerHTML = "";
     const width = W - MARGIN.left - MARGIN.right;
     const height = H - MARGIN.top - MARGIN.bottom;
@@ -193,149 +254,91 @@
     const svg = d3.select(container).append("svg").attr("width", W).attr("height", H);
     const g = svg.append("g").attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
 
-    // Title
-    svg.append("text").attr("x", MARGIN.left).attr("y", 32)
-      .attr("fill", "#1a1a2e").attr("font-size", "26px").attr("font-weight", "700")
-      .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif").text("The Efficiency Challenge");
-    svg.append("text").attr("x", MARGIN.left).attr("y", 58)
-      .attr("fill", "#4a5568").attr("font-size", "16px")
-      .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
-      .text("Higher tariffs don\u2019t automatically mean less water loss");
+    // Title (insight-led)
+    svg.append("text").attr("x", MARGIN.left).attr("y", 38)
+      .attr("fill", "#8b1a2d").attr("font-size", "36px").attr("font-weight", "900")
+      .attr("font-family", "'Playfair Display', Georgia, serif").text("SSA Loses 45% of Its Water Before It Reaches Customers");
+    svg.append("text").attr("x", MARGIN.left).attr("y", 72)
+      .attr("fill", "#4a5568").attr("font-size", "20px")
+      .attr("font-family", "'Nunito', -apple-system, sans-serif")
+      .text("Median tariff (PPP) vs. non-revenue water (%) \u00b7 Bubble size = regional population");
 
-    // Data: regions with both tariff and NRW data
+    // All 6 regions now have NRW data — population-sized bubbles
     const bubbleData = [
-      { region: "Sub-Saharan Africa", tariff: 14.89, nrw: 45, utilities: 3433, hasNRW: true },
-      { region: "Latin America & Caribbean", tariff: 16.67, nrw: 34.24, utilities: 9857, hasNRW: true },
-      { region: "East Asia & Pacific", tariff: 42.72, nrw: 20.94, utilities: 399, hasNRW: true },
-      // Regions without NRW data — show on X-axis only
-      { region: "Europe & Central Asia", tariff: 16.90, nrw: null, utilities: 20807, hasNRW: false },
-      { region: "Middle East, North Africa, Afghanistan & Pakistan", tariff: 35.21, nrw: null, utilities: 5, hasNRW: false },
-      { region: "South Asia", tariff: 1.10, nrw: null, utilities: 0, hasNRW: false },
+      { region: "Sub-Saharan Africa", tariff: 40.8, nrw: 45.0, pop: 1.2 },
+      { region: "Latin America and the Caribbean", tariff: 27.8, nrw: 34.6, pop: 0.66 },
+      { region: "East Asia and Pacific", tariff: 45.0, nrw: 24.9, pop: 2.3 },
+      { region: "Europe and Central Asia", tariff: 37.9, nrw: 34.3, pop: 0.93 },
+      { region: "Middle East, North Africa, Afghanistan and Pakistan", tariff: 37.4, nrw: 26.7, pop: 0.46 },
+      { region: "South Asia", tariff: 4.6, nrw: 20.6, pop: 2.0 },
     ];
 
-    const xScale = d3.scaleLinear().domain([0, 50]).range([0, width]);
+    const xScale = d3.scaleLinear().domain([0, 55]).range([0, width]);
     const yScale = d3.scaleLinear().domain([0, 55]).range([height, 0]);
-    const sizeScale = d3.scaleSqrt().domain([0, 20000]).range([8, 65]);
+    const sizeScale = d3.scaleSqrt().domain([0, 2.5]).range([20, 80]);
 
     // Grid
     g.append("g").selectAll("line").data(yScale.ticks(5)).enter()
       .append("line").attr("x1", 0).attr("x2", width)
       .attr("y1", d => yScale(d)).attr("y2", d => yScale(d))
       .attr("stroke", "rgba(0,0,0,0.05)");
-    // Vertical gridlines removed (Economist style: horizontal only)
 
-    // Axes
+    // Axes — bigger fonts
     g.append("g").attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(xScale).ticks(6).tickFormat(d => "$" + d))
-      .selectAll("text").attr("fill", "#4a5568").attr("font-size", "14px");
+      .selectAll("text").attr("fill", "#4a5568").attr("font-size", "20px");
     g.append("g").call(d3.axisLeft(yScale).ticks(6).tickFormat(d => d + "%"))
-      .selectAll("text").attr("fill", "#4a5568").attr("font-size", "14px");
+      .selectAll("text").attr("fill", "#4a5568").attr("font-size", "20px");
     g.selectAll(".domain").remove();
     g.selectAll(".tick line").attr("stroke", "rgba(0,0,0,0.1)");
 
     // Axis labels
-    g.append("text").attr("x", width / 2).attr("y", height + 50).attr("text-anchor", "middle")
-      .attr("fill", "#4a5568").attr("font-size", "15px").attr("font-weight", "500")
-      .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif").text("Median Tariff (USD / 15 m\u00b3)");
+    g.append("text").attr("x", width / 2).attr("y", height + 55).attr("text-anchor", "middle")
+      .attr("fill", "#4a5568").attr("font-size", "20px").attr("font-weight", "500")
+      .attr("font-family", "'Nunito', -apple-system, sans-serif").text("Median Tariff (PPP USD / 15 m\u00b3)");
     g.append("text").attr("transform", "rotate(-90)")
-      .attr("x", -height / 2).attr("y", -65).attr("text-anchor", "middle")
-      .attr("fill", "#4a5568").attr("font-size", "15px").attr("font-weight", "500")
-      .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif").text("Non-Revenue Water (%)");
+      .attr("x", -height / 2).attr("y", -68).attr("text-anchor", "middle")
+      .attr("fill", "#4a5568").attr("font-size", "20px").attr("font-weight", "500")
+      .attr("font-family", "'Nunito', -apple-system, sans-serif").text("Non-Revenue Water (%)");
 
-    // "Ideal" zone annotation (low NRW, fair tariff)
-    g.append("rect")
-      .attr("x", xScale(10)).attr("y", yScale(25))
-      .attr("width", xScale(50) - xScale(10)).attr("height", yScale(0) - yScale(25))
-      .attr("fill", "#2b9f93").attr("opacity", 0)
-      .transition().duration(800).delay(200)
-      .attr("opacity", 0.04);
-    g.append("text")
-      .attr("x", xScale(32)).attr("y", yScale(3))
-      .attr("text-anchor", "middle")
-      .attr("fill", "#2b9f93").attr("font-size", "12px").attr("font-style", "italic")
-      .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
-      .text("Better performance zone")
-      .attr("opacity", 0)
-      .transition().duration(600).delay(600)
-      .attr("opacity", 0.6);
-
-    // Draw bubbles with staggered animation
-    const withNRW = bubbleData.filter(d => d.hasNRW);
-
-    // First: show regions WITHOUT NRW as small markers on X-axis
-    const noNRW = bubbleData.filter(d => !d.hasNRW && d.utilities > 0);
-    noNRW.forEach((d, i) => {
-      const x = xScale(d.tariff);
-      g.append("line")
-        .attr("x1", x).attr("x2", x)
-        .attr("y1", height - 5).attr("y2", height + 5)
-        .attr("stroke", REGION_COLORS[d.region])
-        .attr("stroke-width", 2)
-        .attr("opacity", 0)
-        .transition().duration(400).delay(400 + i * 100)
-        .attr("opacity", 0.5);
-      g.append("text")
-        .attr("x", x).attr("y", height + 20)
-        .attr("text-anchor", "middle")
-        .attr("fill", REGION_COLORS[d.region])
-        .attr("font-size", "11px").attr("font-style", "italic")
-        .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
-        .text(REGION_SHORT[d.region] + " (no NRW data)")
-        .attr("opacity", 0)
-        .transition().duration(400).delay(500 + i * 100)
-        .attr("opacity", 0.5);
-    });
-
-    // Then: animate bubbles with NRW data
-    withNRW.forEach((d, i) => {
+    // Animate all bubbles — slower stagger
+    bubbleData.forEach((d, i) => {
       const x = xScale(d.tariff);
       const y = yScale(d.nrw);
-      const r = Math.max(sizeScale(d.utilities), 12);
+      const r = sizeScale(d.pop);
       const color = REGION_COLORS[d.region];
 
-      // Bubble starts at center, moves to position
       const bubble = g.append("circle")
-        .attr("cx", width / 2).attr("cy", height / 2)
-        .attr("r", 0)
+        .attr("cx", width / 2).attr("cy", height / 2).attr("r", 0)
         .attr("fill", color).attr("fill-opacity", 0.25)
         .attr("stroke", color).attr("stroke-width", 2.5);
 
-      bubble.transition()
-        .duration(800).delay(800 + i * 400)
+      bubble.transition().duration(1800).delay(600 + i * 600)
+        .ease(d3.easeCubicOut)
         .attr("cx", x).attr("cy", y).attr("r", r);
 
-      // Region label (appears after bubble lands)
       const labelG = g.append("g").attr("opacity", 0);
-
-      // Label position: offset based on bubble size
-      const labelX = x + r + 10;
+      const labelX = x + r + 12;
       const labelY = y;
 
-      labelG.append("text")
-        .attr("x", labelX).attr("y", labelY - 8)
-        .attr("fill", color).attr("font-size", "16px").attr("font-weight", "700")
-        .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
-        .text(REGION_FULL[d.region]);
+      labelG.append("text").attr("x", labelX).attr("y", labelY - 4)
+        .attr("fill", color).attr("font-size", "18px").attr("font-weight", "700")
+        .attr("font-family", "'Nunito', -apple-system, sans-serif")
+        .text(REGION_SHORT[d.region]);
+      labelG.append("text").attr("x", labelX).attr("y", labelY + 16)
+        .attr("fill", "#4a5568").attr("font-size", "15px")
+        .attr("font-family", "'Nunito', -apple-system, sans-serif")
+        .text("$" + d.tariff.toFixed(0) + " tariff \u00b7 " + d.nrw.toFixed(0) + "% NRW");
 
-      labelG.append("text")
-        .attr("x", labelX).attr("y", labelY + 10)
-        .attr("fill", "#4a5568").attr("font-size", "13px")
-        .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
-        .text(`$${d.tariff.toFixed(0)} tariff \u00b7 ${d.nrw.toFixed(0)}% NRW \u00b7 ${d.utilities.toLocaleString()} utilities`);
-
-      labelG.transition().duration(500).delay(1200 + i * 400).attr("opacity", 1);
+      labelG.transition().duration(600).delay(1600 + i * 600).attr("opacity", 1);
     });
 
-    // Insight box
-    const insightG = svg.append("g")
-      .attr("transform", `translate(${MARGIN.left}, ${H - 55})`).attr("opacity", 0);
-    insightG.append("rect").attr("width", width * 0.7).attr("height", 36).attr("rx", 6)
-      .attr("fill", "#fef3f2").attr("stroke", "#e8553a").attr("stroke-width", 1).attr("stroke-opacity", 0.3);
-    insightG.append("text").attr("x", 14).attr("y", 23)
-      .attr("fill", "#1a1a2e").attr("font-size", "14px").attr("font-weight", "500")
-      .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
-      .text("SSA: highest water loss (45%) despite rising tariffs \u2014 revenue isn\u2019t funding infrastructure repair");
-    insightG.transition().duration(600).delay(800 + withNRW.length * 400 + 600).attr("opacity", 1);
+    // Population note at bottom
+    svg.append("text")
+      .attr("x", MARGIN.left).attr("y", H - 30)
+      .attr("fill", "#6b7280").attr("font-size", "13px").attr("font-style", "italic")
+      .attr("font-family", "'Nunito', -apple-system, sans-serif")
+      .text("Bubble size represents regional population (World Bank, 2024): SAR 2.0B \u00b7 EAP 2.3B \u00b7 SSA 1.2B \u00b7 ECA 0.9B \u00b7 LAC 0.7B \u00b7 MENA 0.5B");
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -358,7 +361,7 @@
 
     // Title
     svg.append("text").attr("x", MARGIN.left).attr("y", 32)
-      .attr("fill", "#1a1a2e").attr("font-size", "26px").attr("font-weight", "700")
+      .attr("fill", "#282c34").attr("font-size", "26px").attr("font-weight", "700")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif").text("Meter Coverage by Region");
     svg.append("text").attr("x", MARGIN.left).attr("y", 58)
       .attr("fill", "#4a5568").attr("font-size", "16px")
@@ -399,7 +402,7 @@
     g.append("g")
       .attr("transform", `translate(0,${yBand.range()[1]})`)
       .call(d3.axisBottom(xScale).ticks(5).tickFormat(d => d + "%"))
-      .selectAll("text").attr("fill", "#8898aa").attr("font-size", "14px");
+      .selectAll("text").attr("fill", "#6b7280").attr("font-size", "14px");
     g.selectAll(".domain").remove();
     g.selectAll(".tick line").attr("stroke", "rgba(0,0,0,0.1)");
 
@@ -413,7 +416,7 @@
         .attr("x", 0).attr("y", barY)
         .attr("width", xScale(105)).attr("height", barH)
         .attr("rx", 4)
-        .attr("fill", "#f0f2f5");
+        .attr("fill", "#d8e8f0");
 
       // Value bar (animated)
       g.append("rect")
@@ -428,7 +431,7 @@
       g.append("text")
         .attr("x", -12).attr("y", barY + barH / 2 + 5)
         .attr("text-anchor", "end")
-        .attr("fill", "#1a1a2e").attr("font-size", "16px").attr("font-weight", "600")
+        .attr("fill", "#282c34").attr("font-size", "16px").attr("font-weight", "600")
         .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
         .text(d.full);
 
@@ -445,7 +448,7 @@
       // Year label (small, after value)
       g.append("text")
         .attr("x", xScale(d.value) + 65).attr("y", barY + barH / 2 + 5)
-        .attr("fill", "#8898aa").attr("font-size", "12px").attr("font-style", "italic")
+        .attr("fill", "#6b7280").attr("font-size", "12px").attr("font-style", "italic")
         .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
         .text("(" + d.year + ")")
         .attr("opacity", 0)
@@ -457,9 +460,9 @@
     const insightG = svg.append("g")
       .attr("transform", `translate(${MARGIN.left}, ${H - 55})`).attr("opacity", 0);
     insightG.append("rect").attr("width", width * 0.75).attr("height", 36).attr("rx", 6)
-      .attr("fill", "#eef5fa").attr("stroke", "#0071bc").attr("stroke-width", 1).attr("stroke-opacity", 0.3);
+      .attr("fill", "#f0e8e4").attr("stroke", "#1a3a5c").attr("stroke-width", 1).attr("stroke-opacity", 0.3);
     insightG.append("text").attr("x", 14).attr("y", 23)
-      .attr("fill", "#1a1a2e").attr("font-size", "14px").attr("font-weight", "500")
+      .attr("fill", "#282c34").attr("font-size", "14px").attr("font-weight", "500")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
       .text("High metering alone doesn\u2019t fix NRW \u2014 Latin America has 98% metering but 34% water loss");
     insightG.transition().duration(600).delay(300 + barData.length * 150 + 500).attr("opacity", 1);
@@ -467,7 +470,7 @@
     // Data note
     svg.append("text")
       .attr("x", W - 20).attr("y", H - 10).attr("text-anchor", "end")
-      .attr("fill", "#8898aa").attr("font-size", "11px").attr("font-style", "italic")
+      .attr("fill", "#6b7280").attr("font-size", "11px").attr("font-style", "italic")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
       .text("East Asia & South Asia data ends 2017 and 2015 respectively")
       .attr("opacity", 0).transition().duration(400).delay(1500).attr("opacity", 0.7);
@@ -493,7 +496,7 @@
 
     // Title
     svg.append("text").attr("x", MARGIN.left).attr("y", 32)
-      .attr("fill", "#1a1a2e").attr("font-size", "26px").attr("font-weight", "700")
+      .attr("fill", "#282c34").attr("font-size", "26px").attr("font-weight", "700")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif").text("Operating Cost Coverage");
     svg.append("text").attr("x", MARGIN.left).attr("y", 58)
       .attr("fill", "#4a5568").attr("font-size", "16px")
@@ -518,10 +521,10 @@
     g.append("line")
       .attr("x1", 0).attr("x2", width)
       .attr("y1", yScale(100)).attr("y2", yScale(100))
-      .attr("stroke", "#e8553a").attr("stroke-width", 2).attr("stroke-dasharray", "8,4");
+      .attr("stroke", "#b85c70").attr("stroke-width", 2).attr("stroke-dasharray", "8,4");
     g.append("text")
       .attr("x", width + 8).attr("y", yScale(100) + 5)
-      .attr("fill", "#e8553a").attr("font-size", "13px").attr("font-weight", "600")
+      .attr("fill", "#b85c70").attr("font-size", "13px").attr("font-weight", "600")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
       .text("100% = Breakeven");
 
@@ -530,7 +533,7 @@
       .call(d3.axisBottom(xScale).tickFormat(d3.format("d")))
       .selectAll("text").attr("fill", "#4a5568").attr("font-size", "14px");
     g.append("g").call(d3.axisLeft(yScale).ticks(6).tickFormat(d => d + "%"))
-      .selectAll("text").attr("fill", "#8898aa").attr("font-size", "14px");
+      .selectAll("text").attr("fill", "#6b7280").attr("font-size", "14px");
     g.selectAll(".domain").remove();
     g.selectAll(".tick line").attr("stroke", "rgba(0,0,0,0.1)");
 
@@ -545,7 +548,7 @@
       const x = xScale(d.year) + xScale.bandwidth() / 2;
       const y = yScale(d.value);
       const isAbove = d.value >= 100;
-      const color = isAbove ? "#2b9f93" : "#e8553a";
+      const color = isAbove ? "#2e6da4" : "#b85c70";
 
       // Stem from 100% line to value
       g.append("line")
@@ -584,7 +587,7 @@
         .attr("opacity", 0);
       arrowG.append("text")
         .attr("text-anchor", "middle")
-        .attr("fill", "#e8553a").attr("font-size", "18px").attr("font-weight", "700")
+        .attr("fill", "#b85c70").attr("font-size", "18px").attr("font-weight", "700")
         .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
         .text(`${first.value.toFixed(0)}% \u2192 ${last.value.toFixed(0)}%  (\u2013${(first.value - last.value).toFixed(0)} pts)`);
       arrowG.transition().duration(600).delay(400 + ssaData.length * 100 + 300).attr("opacity", 1);
@@ -594,9 +597,9 @@
     const insightG = svg.append("g")
       .attr("transform", `translate(${MARGIN.left}, ${H - 55})`).attr("opacity", 0);
     insightG.append("rect").attr("width", width * 0.65).attr("height", 36).attr("rx", 6)
-      .attr("fill", "#fef3f2").attr("stroke", "#e8553a").attr("stroke-width", 1).attr("stroke-opacity", 0.3);
+      .attr("fill", "#f8f5f0").attr("stroke", "#b85c70").attr("stroke-width", 1).attr("stroke-opacity", 0.3);
     insightG.append("text").attr("x", 14).attr("y", 23)
-      .attr("fill", "#1a1a2e").attr("font-size", "14px").attr("font-weight", "500")
+      .attr("fill", "#282c34").attr("font-size", "14px").attr("font-weight", "500")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
       .text("Costs are rising faster than revenue \u2014 utilities are becoming financially unsustainable");
     insightG.transition().duration(600).delay(400 + ssaData.length * 100 + 600).attr("opacity", 1);
@@ -604,7 +607,7 @@
     // Data note
     svg.append("text")
       .attr("x", W - 20).attr("y", H - 10).attr("text-anchor", "end")
-      .attr("fill", "#8898aa").attr("font-size", "11px").attr("font-style", "italic")
+      .attr("fill", "#6b7280").attr("font-size", "11px").attr("font-style", "italic")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
       .text("Only Sub-Saharan Africa has sufficient data for trend analysis")
       .attr("opacity", 0).transition().duration(400).delay(1800).attr("opacity", 0.7);
@@ -631,7 +634,7 @@
 
     // Title
     svg.append("text").attr("x", margin.left).attr("y", 32)
-      .attr("fill", "#1a1a2e").attr("font-size", "26px").attr("font-weight", "700")
+      .attr("fill", "#282c34").attr("font-size", "26px").attr("font-weight", "700")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif").text("The Investment Paradox");
     svg.append("text").attr("x", margin.left).attr("y", 58)
       .attr("fill", "#4a5568").attr("font-size", "16px")
@@ -665,25 +668,25 @@
     // X axis
     g.append("g").attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(xScale).tickFormat(d3.format("d")).ticks(8))
-      .selectAll("text").attr("fill", "#8898aa").attr("font-size", "14px");
+      .selectAll("text").attr("fill", "#6b7280").attr("font-size", "14px");
 
     // Left Y (Tariff - blue)
     const leftAxis = g.append("g").call(d3.axisLeft(yLeft).ticks(5));
-    leftAxis.selectAll("text").attr("fill", "#0071bc").attr("font-size", "13px");
-    leftAxis.selectAll("path, line").attr("stroke", "#0071bc").attr("stroke-opacity", 0.3);
+    leftAxis.selectAll("text").attr("fill", "#1a3a5c").attr("font-size", "13px");
+    leftAxis.selectAll("path, line").attr("stroke", "#1a3a5c").attr("stroke-opacity", 0.3);
     g.append("text").attr("transform", "rotate(-90)")
       .attr("x", -height / 2).attr("y", -55).attr("text-anchor", "middle")
-      .attr("fill", "#0071bc").attr("font-size", "14px").attr("font-weight", "600")
-      .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif").text("Tariff (USD / 15 m\u00b3)");
+      .attr("fill", "#1a3a5c").attr("font-size", "14px").attr("font-weight", "600")
+      .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif").text("Tariff (PPP USD / 15 m\u00b3)");
 
     // Right Y (NRW - red)
     const rightAxis = g.append("g").attr("transform", `translate(${width},0)`)
       .call(d3.axisRight(yRight).ticks(5));
-    rightAxis.selectAll("text").attr("fill", "#e8553a").attr("font-size", "13px");
-    rightAxis.selectAll("path, line").attr("stroke", "#e8553a").attr("stroke-opacity", 0.3);
+    rightAxis.selectAll("text").attr("fill", "#b85c70").attr("font-size", "13px");
+    rightAxis.selectAll("path, line").attr("stroke", "#b85c70").attr("stroke-opacity", 0.3);
     g.append("text").attr("transform", "rotate(90)")
       .attr("x", height / 2).attr("y", -width - 55).attr("text-anchor", "middle")
-      .attr("fill", "#e8553a").attr("font-size", "14px").attr("font-weight", "600")
+      .attr("fill", "#b85c70").attr("font-size", "14px").attr("font-weight", "600")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif").text("Non-Revenue Water (%)");
     g.selectAll(".domain").remove();
 
@@ -692,7 +695,7 @@
 
     // Tariff line
     const tPath = g.append("path").datum(ssaTariffs).attr("fill", "none")
-      .attr("stroke", "#0071bc").attr("stroke-width", 3.5).attr("stroke-linecap", "round").attr("d", lineTariff);
+      .attr("stroke", "#1a3a5c").attr("stroke-width", 3.5).attr("stroke-linecap", "round").attr("d", lineTariff);
     const tLen = tPath.node().getTotalLength();
     tPath.attr("stroke-dasharray", tLen).attr("stroke-dashoffset", tLen)
       .transition().duration(TRANSITION_MS).ease(d3.easeCubicOut).attr("stroke-dashoffset", 0)
@@ -700,7 +703,7 @@
 
     // NRW SSA line
     const nPath = g.append("path").datum(ssaNRW).attr("fill", "none")
-      .attr("stroke", "#e8553a").attr("stroke-width", 3.5).attr("stroke-linecap", "round").attr("d", lineNRW);
+      .attr("stroke", "#b85c70").attr("stroke-width", 3.5).attr("stroke-linecap", "round").attr("d", lineNRW);
     const nLen = nPath.node().getTotalLength();
     nPath.attr("stroke-dasharray", nLen).attr("stroke-dashoffset", nLen)
       .transition().duration(TRANSITION_MS).delay(300).ease(d3.easeCubicOut).attr("stroke-dashoffset", 0)
@@ -709,7 +712,7 @@
     // Global NRW dashed
     if (globalNRW.length >= 2) {
       const gnPath = g.append("path").datum(globalNRW).attr("fill", "none")
-        .attr("stroke", "#e8553a").attr("stroke-width", 2)
+        .attr("stroke", "#b85c70").attr("stroke-width", 2)
         .attr("stroke-dasharray", "6,4").attr("stroke-opacity", 0.4).attr("d", lineNRW);
       const gnLen = gnPath.node().getTotalLength();
       gnPath.attr("stroke-dasharray", gnLen).attr("stroke-dashoffset", gnLen)
@@ -721,31 +724,31 @@
     const tLast = ssaTariffs[ssaTariffs.length - 1];
     const nLast = ssaNRW[ssaNRW.length - 1];
     g.append("circle").attr("cx", xScale(tLast.year)).attr("cy", yLeft(tLast.value))
-      .attr("r", 6).attr("fill", "#0071bc").attr("stroke", "#fff").attr("stroke-width", 2)
+      .attr("r", 6).attr("fill", "#1a3a5c").attr("stroke", "#fff").attr("stroke-width", 2)
       .attr("opacity", 0).transition().duration(400).delay(TRANSITION_MS + 200).attr("opacity", 1);
     g.append("text").attr("x", xScale(tLast.year) - 60).attr("y", yLeft(tLast.value) - 14)
-      .attr("fill", "#0071bc").attr("font-size", "16px").attr("font-weight", "700")
+      .attr("fill", "#1a3a5c").attr("font-size", "16px").attr("font-weight", "700")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif").text("Tariffs $" + tLast.value.toFixed(1))
       .attr("opacity", 0).transition().duration(400).delay(TRANSITION_MS + 400).attr("opacity", 1);
     g.append("text").attr("x", xScale(tLast.year) - 15).attr("y", yLeft(tLast.value) - 30)
-      .attr("fill", "#0071bc").attr("font-size", "24px").text("\u2191")
+      .attr("fill", "#1a3a5c").attr("font-size", "24px").text("\u2191")
       .attr("opacity", 0).transition().duration(400).delay(TRANSITION_MS + 600).attr("opacity", 0.8);
     g.append("circle").attr("cx", xScale(nLast.year)).attr("cy", yRight(nLast.value))
-      .attr("r", 6).attr("fill", "#e8553a").attr("stroke", "#fff").attr("stroke-width", 2)
+      .attr("r", 6).attr("fill", "#b85c70").attr("stroke", "#fff").attr("stroke-width", 2)
       .attr("opacity", 0).transition().duration(400).delay(TRANSITION_MS + 500).attr("opacity", 1);
     g.append("text").attr("x", xScale(nLast.year) - 50).attr("y", yRight(nLast.value) + 28)
-      .attr("fill", "#e8553a").attr("font-size", "16px").attr("font-weight", "700")
+      .attr("fill", "#b85c70").attr("font-size", "16px").attr("font-weight", "700")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif").text("NRW " + nLast.value.toFixed(0) + "%")
       .attr("opacity", 0).transition().duration(400).delay(TRANSITION_MS + 700).attr("opacity", 1);
     g.append("text").attr("x", xScale(nLast.year) + 5).attr("y", yRight(nLast.value) + 45)
-      .attr("fill", "#e8553a").attr("font-size", "24px").text("\u2191")
+      .attr("fill", "#b85c70").attr("font-size", "24px").text("\u2191")
       .attr("opacity", 0).transition().duration(400).delay(TRANSITION_MS + 800).attr("opacity", 0.8);
 
     // Legend
     const legendData = [
-      { label: "SSA Tariff (left axis)", color: "#0071bc", dashed: false },
-      { label: "SSA Non-Revenue Water (right axis)", color: "#e8553a", dashed: false },
-      { label: "Global NRW (right axis)", color: "#e8553a", dashed: true },
+      { label: "SSA Tariff (left axis)", color: "#1a3a5c", dashed: false },
+      { label: "SSA Non-Revenue Water (right axis)", color: "#b85c70", dashed: false },
+      { label: "Global NRW (right axis)", color: "#b85c70", dashed: true },
     ];
     const legendG = svg.append("g").attr("transform", `translate(${margin.left + 10}, ${margin.top - 15})`);
     legendData.forEach((item, i) => {
@@ -762,9 +765,9 @@
     const insightG = svg.append("g")
       .attr("transform", `translate(${margin.left + width * 0.2}, ${H - 50})`).attr("opacity", 0);
     insightG.append("rect").attr("width", width * 0.6).attr("height", 36).attr("rx", 6)
-      .attr("fill", "#fef3f2").attr("stroke", "#e8553a").attr("stroke-width", 1).attr("stroke-opacity", 0.3);
+      .attr("fill", "#f8f5f0").attr("stroke", "#b85c70").attr("stroke-width", 1).attr("stroke-opacity", 0.3);
     insightG.append("text").attr("x", 14).attr("y", 23)
-      .attr("fill", "#1a1a2e").attr("font-size", "14px").attr("font-weight", "500")
+      .attr("fill", "#282c34").attr("font-size", "14px").attr("font-weight", "500")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
       .text("Tariff revenue is not being invested in reducing water losses \u2014 the system is leaking money");
     insightG.transition().duration(600).delay(TRANSITION_MS + 1000).attr("opacity", 1);
@@ -775,6 +778,7 @@
   // ═══════════════════════════════════════════════════════════
   const RENDERERS = {
     tariffs: renderTariffs,
+    "tariffs-nominal": renderTariffsNominal,
     nrw: renderNRWBubble,
     metering: renderMetering,
     "cost-coverage": renderCostCoverage,
