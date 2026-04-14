@@ -669,30 +669,6 @@
       .text("→ Decrease in freshwater availability");
     blG.transition().duration(600).delay(annoDelay + 200).attr("opacity", 1);
 
-    // Insight bar
-    const insightG = svg
-      .append("g")
-      .attr("transform", `translate(${MARGIN.left}, ${H - 55})`)
-      .attr("opacity", 0);
-    insightG
-      .append("rect")
-      .attr("width", width * 0.68)
-      .attr("height", 36)
-      .attr("rx", 6)
-      .attr("fill", "#f0e8e4")
-      .attr("stroke", "#1a3a5c")
-      .attr("stroke-width", 1)
-      .attr("stroke-opacity", 0.3);
-    insightG
-      .append("text")
-      .attr("x", 14)
-      .attr("y", 23)
-      .attr("fill", "#282c34")
-      .attr("font-size", "17px")
-      .attr("font-weight", "500")
-      .attr("font-family", FONT)
-      .text("Cheap energy subsidizes groundwater pumping. Pricing energy correctly conserves water");
-    insightG.transition().duration(600).delay(annoDelay + 600).attr("opacity", 1);
   }
 
   // ═══════════════════════════════════════════════════════════
