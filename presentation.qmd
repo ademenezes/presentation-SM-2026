@@ -582,7 +582,7 @@ Source: IBNET Tariff Portal, World Bank
 ```
 
 ::: {.source}
-Source: Borja-Vega, Zhang, Diallo (2023), American Economic Journal: Applied Economics
+Source: Chakravorty, Dar, Emerick (2023), American Economic Journal: Applied Economics, 15(1)
 :::
 
 
