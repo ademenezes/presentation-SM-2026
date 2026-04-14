@@ -342,6 +342,115 @@
   }
 
   // ═══════════════════════════════════════════════════════════
+  // AFFORDABILITY — Paired horizontal bars (GDP vs B20)
+  // ═══════════════════════════════════════════════════════════
+  async function renderAffordability() {
+    const container = document.getElementById("hero-chart-affordability");
+    if (!container) return;
+    container.innerHTML = "";
+
+    let rawData = await fetch("data/affordability_gap.json?v=1").then(r => r.json());
+    if (!rawData || !rawData.length) return;
+
+    // Filter to interesting cases and limit
+    const data = rawData.filter(d => d.affordB20 > 3).slice(0, 10);
+    if (!data.length) return;
+
+    const { W, H } = getDimensions();
+    const MARGIN = { top: 100, right: 120, bottom: 60, left: 260 };
+    const width = W - MARGIN.left - MARGIN.right;
+    const height = H - MARGIN.top - MARGIN.bottom;
+    const FONT = "'Nunito', -apple-system, sans-serif";
+    const FONT_H = "'Playfair Display', Georgia, serif";
+
+    const svg = d3.select(container).append("svg").attr("width", W).attr("height", H);
+    const g = svg.append("g").attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
+
+    // Title
+    svg.append("text").attr("x", MARGIN.left).attr("y", 38)
+      .attr("fill", "#8b1a2d").attr("font-size", "36px").attr("font-weight", "900")
+      .attr("font-family", FONT_H).text("Tariffs Are Low on Average : But Not for the Poor");
+    svg.append("text").attr("x", MARGIN.left).attr("y", 72)
+      .attr("fill", "#4a5568").attr("font-size", "20px")
+      .attr("font-family", FONT).text("Monthly water bill (15 m\u00b3) as % of income \u00b7 National average vs bottom 20%");
+
+    const yBand = d3.scaleBand()
+      .domain(data.map(d => d.name))
+      .range([0, height])
+      .padding(0.3);
+
+    const maxVal = Math.min(d3.max(data, d => d.affordB20), 45);
+    const xScale = d3.scaleLinear().domain([0, maxVal]).range([0, width]);
+
+    // Grid
+    g.append("g").selectAll("line").data(xScale.ticks(5)).enter()
+      .append("line").attr("x1", d => xScale(d)).attr("x2", d => xScale(d))
+      .attr("y1", 0).attr("y2", height).attr("stroke", "rgba(0,0,0,0.06)");
+
+    // WHO 3% threshold
+    g.append("line").attr("x1", xScale(3)).attr("x2", xScale(3))
+      .attr("y1", -10).attr("y2", height + 10)
+      .attr("stroke", "#b85c70").attr("stroke-width", 2).attr("stroke-dasharray", "8,4");
+    g.append("text").attr("x", xScale(3) + 6).attr("y", -4)
+      .attr("fill", "#b85c70").attr("font-size", "14px").attr("font-weight", "600")
+      .attr("font-family", FONT).text("3% WHO threshold");
+
+    // X axis
+    g.append("g").attr("transform", `translate(0,${height})`)
+      .call(d3.axisBottom(xScale).ticks(5).tickFormat(d => d + "%"))
+      .selectAll("text").attr("fill", "#6b7280").attr("font-size", "18px");
+    g.selectAll(".domain").remove();
+    g.selectAll(".tick line").attr("stroke", "rgba(0,0,0,0.1)");
+
+    // Bars
+    const barH = yBand.bandwidth() / 2 - 2;
+
+    data.forEach((d, i) => {
+      const y = yBand(d.name);
+      const gdpVal = Math.min(d.affordGdp, maxVal);
+      const b20Val = Math.min(d.affordB20, maxVal);
+
+      // Country label
+      g.append("text").attr("x", -12).attr("y", y + yBand.bandwidth() / 2 + 5)
+        .attr("text-anchor", "end").attr("fill", "#282c34")
+        .attr("font-size", "17px").attr("font-weight", "600").attr("font-family", FONT)
+        .text(d.name);
+
+      // GDP bar (navy — national average)
+      g.append("rect").attr("x", 0).attr("y", y)
+        .attr("width", 0).attr("height", barH).attr("rx", 3)
+        .attr("fill", "#1a3a5c").attr("fill-opacity", 0.8)
+        .transition().duration(800).delay(200 + i * 80)
+        .attr("width", xScale(gdpVal));
+
+      // B20 bar (maroon — bottom 20%)
+      g.append("rect").attr("x", 0).attr("y", y + barH + 4)
+        .attr("width", 0).attr("height", barH).attr("rx", 3)
+        .attr("fill", "#8b1a2d").attr("fill-opacity", 0.8)
+        .transition().duration(800).delay(300 + i * 80)
+        .attr("width", xScale(b20Val));
+
+      // Value labels
+      g.append("text").attr("x", xScale(gdpVal) + 8).attr("y", y + barH / 2 + 4)
+        .attr("fill", "#1a3a5c").attr("font-size", "14px").attr("font-weight", "600")
+        .attr("font-family", FONT).text(d.affordGdp.toFixed(1) + "%")
+        .attr("opacity", 0).transition().duration(400).delay(600 + i * 80).attr("opacity", 1);
+
+      g.append("text").attr("x", xScale(b20Val) + 8).attr("y", y + barH + 4 + barH / 2 + 4)
+        .attr("fill", "#8b1a2d").attr("font-size", "14px").attr("font-weight", "600")
+        .attr("font-family", FONT).text((d.affordB20 > maxVal ? ">" + maxVal : d.affordB20.toFixed(1)) + "%")
+        .attr("opacity", 0).transition().duration(400).delay(700 + i * 80).attr("opacity", 1);
+    });
+
+    // Legend
+    const legG = svg.append("g").attr("transform", `translate(${MARGIN.left + width - 300}, ${MARGIN.top - 20})`);
+    legG.append("rect").attr("width", 14).attr("height", 14).attr("rx", 2).attr("fill", "#1a3a5c").attr("fill-opacity", 0.8);
+    legG.append("text").attr("x", 20).attr("y", 12).attr("fill", "#4a5568").attr("font-size", "15px").attr("font-family", FONT).text("National average (% of GDP pc)");
+    legG.append("rect").attr("y", 22).attr("width", 14).attr("height", 14).attr("rx", 2).attr("fill", "#8b1a2d").attr("fill-opacity", 0.8);
+    legG.append("text").attr("x", 20).attr("y", 34).attr("fill", "#4a5568").attr("font-size", "15px").attr("font-family", FONT).text("Bottom 20% income group");
+  }
+
+  // ═══════════════════════════════════════════════════════════
   // METERING — Horizontal bar chart
   // ═══════════════════════════════════════════════════════════
   function renderMetering() {
@@ -366,7 +475,7 @@
     svg.append("text").attr("x", MARGIN.left).attr("y", 58)
       .attr("fill", "#4a5568").attr("font-size", "16px")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
-      .text("You can\u2019t manage what you don\u2019t measure \u2014 but metering alone isn\u2019t enough");
+      .text("You can\u2019t manage what you don\u2019t measure : but metering alone isn\u2019t enough");
 
     // Get latest value per region
     const barData = Object.keys(data).filter(r => r !== "Global").map(region => {
@@ -464,7 +573,7 @@
     insightG.append("text").attr("x", 14).attr("y", 23)
       .attr("fill", "#282c34").attr("font-size", "14px").attr("font-weight", "500")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
-      .text("High metering alone doesn\u2019t fix NRW \u2014 Latin America has 98% metering but 34% water loss");
+      .text("High metering alone doesn\u2019t fix NRW : Latin America has 98% metering but 34% water loss");
     insightG.transition().duration(600).delay(300 + barData.length * 150 + 500).attr("opacity", 1);
 
     // Data note
@@ -501,7 +610,7 @@
     svg.append("text").attr("x", MARGIN.left).attr("y", 58)
       .attr("fill", "#4a5568").attr("font-size", "16px")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
-      .text("Sub-Saharan Africa: the only region with enough data \u2014 and the trend is declining");
+      .text("Sub-Saharan Africa: the only region with enough data : and the trend is declining");
 
     // SSA data
     const ssaData = (data["Sub-Saharan Africa"] || [])
@@ -601,7 +710,7 @@
     insightG.append("text").attr("x", 14).attr("y", 23)
       .attr("fill", "#282c34").attr("font-size", "14px").attr("font-weight", "500")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
-      .text("Costs are rising faster than revenue \u2014 utilities are becoming financially unsustainable");
+      .text("Costs are rising faster than revenue : utilities are becoming financially unsustainable");
     insightG.transition().duration(600).delay(400 + ssaData.length * 100 + 600).attr("opacity", 1);
 
     // Data note
@@ -639,7 +748,7 @@
     svg.append("text").attr("x", margin.left).attr("y", 58)
       .attr("fill", "#4a5568").attr("font-size", "16px")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
-      .text("Tariffs are rising, but water losses are worsening \u2014 revenue isn\u2019t translating into system improvement");
+      .text("Tariffs are rising, but water losses are worsening : revenue isn\u2019t translating into system improvement");
 
     const ssaTariffs = (tariffData["Sub-Saharan Africa"] || [])
       .map(d => ({ year: d.year, value: d.median15m3 }))
@@ -769,7 +878,7 @@
     insightG.append("text").attr("x", 14).attr("y", 23)
       .attr("fill", "#282c34").attr("font-size", "14px").attr("font-weight", "500")
       .attr("font-family", "-apple-system, BlinkMacSystemFont, sans-serif")
-      .text("Tariff revenue is not being invested in reducing water losses \u2014 the system is leaking money");
+      .text("Tariff revenue is not being invested in reducing water losses : the system is leaking money");
     insightG.transition().duration(600).delay(TRANSITION_MS + 1000).attr("opacity", 1);
   }
 
@@ -783,6 +892,7 @@
     metering: renderMetering,
     "cost-coverage": renderCostCoverage,
     paradox: renderParadox,
+    affordability: renderAffordability,
   };
 
   let dataLoaded = false;

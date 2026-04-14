@@ -281,7 +281,7 @@
           <div style="flex:${rd.noData || 0.01}; background:#d0d0d0;"></div>
         </div>
         <p style="font-size:0.76em; line-height:1.65; color:#444; margin:0;">
-          <strong>${threePct}%</strong> of ${shortName}'s population faces all three burdens —
+          <strong>${threePct}%</strong> of ${shortName}'s population faces all three burdens:
           poverty, ${sector === "water" ? "drought risk" : "flood risk"}, and inadequate ${sector === "water" ? "water access" : "sanitation"}.
           Another <strong>${twoPct}%</strong> faces two.
         </p>

@@ -682,8 +682,20 @@
   margin: 0 !important;
 }
 
+/* ── Slide numbers ─────────────────────────────────────────── */
+.reveal .slide-number {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-maroon);
+  background: transparent;
+  right: 24px;
+  bottom: 18px;
+}
+
 /* ── Hidden fragment triggers ───────────────────────────────── */
-.world-line-trigger {
+.world-line-trigger,
+.cd-cover-trigger {
   position: absolute;
   width: 0;
   height: 0;

@@ -1,0 +1,98 @@
+[
+  {
+    "name": "Mozambique",
+    "iso3": "MOZ",
+    "affordGdp": 10.51,
+    "affordB20": 112.88,
+    "region": "Sub-Saharan Africa",
+    "tariff": 14.9
+  },
+  {
+    "name": "Republic Of Kiribati",
+    "iso3": "KIR",
+    "affordGdp": 30.11,
+    "affordB20": 78.64,
+    "region": "East Asia & Pacific",
+    "tariff": 92.9
+  },
+  {
+    "name": "Nepal",
+    "iso3": "NPL",
+    "affordGdp": 3.92,
+    "affordB20": 38.13,
+    "region": "South Asia",
+    "tariff": 18.7
+  },
+  {
+    "name": "Central African Republic",
+    "iso3": "CAF",
+    "affordGdp": 5.5,
+    "affordB20": 35.06,
+    "region": "Sub-Saharan Africa",
+    "tariff": 5.8
+  },
+  {
+    "name": "Belize",
+    "iso3": "BLZ",
+    "affordGdp": 2.86,
+    "affordB20": 21.38,
+    "region": "Latin America & Caribbean",
+    "tariff": 34.2
+  },
+  {
+    "name": "Djibouti",
+    "iso3": "DJI",
+    "affordGdp": 2.44,
+    "affordB20": 16.9,
+    "region": "Middle East & North Africa",
+    "tariff": 15.9
+  },
+  {
+    "name": "Bulgaria",
+    "iso3": "BGR",
+    "affordGdp": 0.76,
+    "affordB20": 10.17,
+    "region": "Europe & Central Asia",
+    "tariff": 26.7
+  },
+  {
+    "name": "Brazil",
+    "iso3": "BRA",
+    "affordGdp": 0.59,
+    "affordB20": 6.27,
+    "region": "Latin America & Caribbean",
+    "tariff": 10.9
+  },
+  {
+    "name": "Vietnam",
+    "iso3": "VNM",
+    "affordGdp": 0.39,
+    "affordB20": 5.56,
+    "region": "East Asia & Pacific",
+    "tariff": 5.3
+  },
+  {
+    "name": "Sri Lanka",
+    "iso3": "LKA",
+    "affordGdp": 0.47,
+    "affordB20": 5.37,
+    "region": "South Asia",
+    "tariff": 6.1
+  },
+  {
+    "name": "Latvia",
+    "iso3": "LVA",
+    "affordGdp": 0.54,
+    "affordB20": 4.21,
+    "region": "Europe & Central Asia",
+    "tariff": 19.4
+  },
+  {
+    "name": "Israel",
+    "iso3": "ISR",
+    "affordGdp": 0.74,
+    "affordB20": 4.07,
+    "region": "Middle East & North Africa",
+    "tariff": 35.2
+  }
+]

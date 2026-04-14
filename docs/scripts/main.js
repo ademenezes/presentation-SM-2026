@@ -53,7 +53,7 @@ function revealPolicyPoints(slide) {
 }
 
 // ── Hero chart slide IDs ────────────────────────────────────
-const HERO_SLIDES = ["tariffs", "tariffs-nominal", "nrw", "metering", "cost-coverage", "paradox"];
+const HERO_SLIDES = ["tariffs", "tariffs-nominal", "nrw", "metering", "cost-coverage", "paradox", "affordability"];
 
 // ── Initialize on Reveal ready ──────────────────────────────
 (function initMain() {

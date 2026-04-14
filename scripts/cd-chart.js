@@ -455,8 +455,8 @@
   // ═══════════════════════════════════════════════════════════
   // CHART C: Electricity-TWS Relationship
   // ═══════════════════════════════════════════════════════════
-  function renderElectricityTWS() {
-    const container = document.getElementById("chart-energy-tws");
+  function renderElectricityTWS(containerId) {
+    const container = document.getElementById(containerId || "chart-energy-tws");
     if (!container) return;
     const data = cdData.electricity;
     if (!data) return;
@@ -509,32 +509,32 @@
       .call(d3.axisBottom(xScale).ticks(7))
       .selectAll("text")
       .attr("fill", "#6b7280")
-      .attr("font-size", "14px");
+      .attr("font-size", "20px");
     g.append("g")
       .call(d3.axisLeft(yScale).ticks(5))
       .selectAll("text")
       .attr("fill", "#6b7280")
-      .attr("font-size", "14px");
+      .attr("font-size", "20px");
     g.selectAll(".domain").remove();
     g.selectAll(".tick line").attr("stroke", "rgba(0,0,0,0.1)");
 
     // Axis labels
     g.append("text")
       .attr("x", width / 2)
-      .attr("y", height + 55)
+      .attr("y", height + 60)
       .attr("text-anchor", "middle")
       .attr("fill", "#4a5568")
-      .attr("font-size", "15px")
+      .attr("font-size", "20px")
       .attr("font-weight", "500")
       .attr("font-family", FONT)
       .text("Energy price, residualized (% change)");
     g.append("text")
       .attr("transform", "rotate(-90)")
       .attr("x", -height / 2)
-      .attr("y", -75)
+      .attr("y", -80)
       .attr("text-anchor", "middle")
       .attr("fill", "#4a5568")
-      .attr("font-size", "15px")
+      .attr("font-size", "20px")
       .attr("font-weight", "500")
       .attr("font-family", FONT)
       .text("Depth of terrestrial water storage (mm)");
@@ -543,18 +543,18 @@
     svg
       .append("text")
       .attr("x", MARGIN.left)
-      .attr("y", 32)
+      .attr("y", 36)
       .attr("fill", "#282c34")
-      .attr("font-size", "26px")
+      .attr("font-size", "30px")
       .attr("font-weight", "700")
       .attr("font-family", FONT)
       .text("Impact of Energy Pricing on Terrestrial Water Storage");
     svg
       .append("text")
       .attr("x", MARGIN.left)
-      .attr("y", 58)
+      .attr("y", 64)
       .attr("fill", "#4a5568")
-      .attr("font-size", "16px")
+      .attr("font-size", "20px")
       .attr("font-family", FONT)
       .text("In irrigation-intensive countries (local polynomial smoothed)");
 
@@ -611,8 +611,8 @@
       .append("rect")
       .attr("x", xScale(55))
       .attr("y", yScale(42))
-      .attr("width", 260)
-      .attr("height", 44)
+      .attr("width", 300)
+      .attr("height", 52)
       .attr("rx", 6)
       .attr("fill", "#fff")
       .attr("stroke", COLOR_GAIN)
@@ -620,19 +620,19 @@
       .attr("stroke-opacity", 0.4);
     trG
       .append("text")
-      .attr("x", xScale(55) + 12)
-      .attr("y", yScale(42) + 18)
+      .attr("x", xScale(55) + 14)
+      .attr("y", yScale(42) + 22)
       .attr("fill", COLOR_GAIN)
-      .attr("font-size", "13px")
+      .attr("font-size", "17px")
       .attr("font-weight", "600")
       .attr("font-family", FONT)
       .text("High electricity prices");
     trG
       .append("text")
-      .attr("x", xScale(55) + 12)
-      .attr("y", yScale(42) + 36)
+      .attr("x", xScale(55) + 14)
+      .attr("y", yScale(42) + 42)
       .attr("fill", COLOR_GAIN)
-      .attr("font-size", "12px")
+      .attr("font-size", "15px")
       .attr("font-family", FONT)
       .text("→ Increase in freshwater availability");
     trG.transition().duration(600).delay(annoDelay).attr("opacity", 1);
@@ -643,8 +643,8 @@
       .append("rect")
       .attr("x", xScale(-145))
       .attr("y", yScale(-28))
-      .attr("width", 260)
-      .attr("height", 44)
+      .attr("width", 300)
+      .attr("height", 52)
       .attr("rx", 6)
       .attr("fill", "#fff")
       .attr("stroke", COLOR_LOSS)
@@ -652,19 +652,19 @@
       .attr("stroke-opacity", 0.4);
     blG
       .append("text")
-      .attr("x", xScale(-145) + 12)
-      .attr("y", yScale(-28) + 18)
+      .attr("x", xScale(-145) + 14)
+      .attr("y", yScale(-28) + 22)
       .attr("fill", COLOR_LOSS)
-      .attr("font-size", "13px")
+      .attr("font-size", "17px")
       .attr("font-weight", "600")
       .attr("font-family", FONT)
       .text("Low electricity prices");
     blG
       .append("text")
-      .attr("x", xScale(-145) + 12)
-      .attr("y", yScale(-28) + 36)
+      .attr("x", xScale(-145) + 14)
+      .attr("y", yScale(-28) + 42)
       .attr("fill", COLOR_LOSS)
-      .attr("font-size", "12px")
+      .attr("font-size", "15px")
       .attr("font-family", FONT)
       .text("→ Decrease in freshwater availability");
     blG.transition().duration(600).delay(annoDelay + 200).attr("opacity", 1);
@@ -688,10 +688,10 @@
       .attr("x", 14)
       .attr("y", 23)
       .attr("fill", "#282c34")
-      .attr("font-size", "14px")
+      .attr("font-size", "17px")
       .attr("font-weight", "500")
       .attr("font-family", FONT)
-      .text("Cheap energy subsidizes groundwater pumping — pricing energy correctly conserves water");
+      .text("Cheap energy subsidizes groundwater pumping. Pricing energy correctly conserves water");
     insightG.transition().duration(600).delay(annoDelay + 600).attr("opacity", 1);
   }
 
@@ -701,7 +701,8 @@
   const RENDERERS = {
     "freshwater-loss": renderFreshwaterLoss,
     "land-use-tws": renderLandUse,
-    "energy-tws": renderElectricityTWS,
+    "energy-tws": function() { renderElectricityTWS("chart-energy-tws"); },
+    "energy-pricing": function() { renderElectricityTWS("chart-energy-pricing"); },
   };
 
   async function handleSlide(id) {
@@ -711,16 +712,26 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    if (typeof Reveal === "undefined") return;
+  // Listen for robust dispatch from inline script
+  document.addEventListener("cd-render", async (e) => {
+    await loadCDData();
+    const id = e.detail.slide;
+    if (RENDERERS[id]) RENDERERS[id]();
+  });
 
-    Reveal.on("slidechanged", (event) => {
-      handleSlide(event.currentSlide.id || "");
-    });
-
-    Reveal.on("ready", () => {
+  (function setupCD() {
+    if (typeof Reveal === "undefined") {
+      document.addEventListener("DOMContentLoaded", function() { setTimeout(setupCD, 300); });
+      return;
+    }
+    function register() {
+      Reveal.on("slidechanged", (event) => {
+        handleSlide(event.currentSlide.id || "");
+      });
       const slide = Reveal.getCurrentSlide();
       if (slide) handleSlide(slide.id || "");
-    });
-  });
+    }
+    if (Reveal.isReady && Reveal.isReady()) register();
+    else Reveal.on("ready", register);
+  })();
 })();
