@@ -63,22 +63,43 @@ Use official World Bank Group region names (not abbreviations with "&"):
 - **Iframe border cover**: JS-injected div covers external iframe top border
 
 ## Chart Modules
-- `scripts/hero-chart.js` -- Shared tariff renderer (PPP + nominal), NRW bubble chart, metering bars, cost coverage lollipop, paradox dual-axis
+- `scripts/hero-chart.js` -- Tariff renderer (nominal), NRW bubble chart, affordability paired bars, metering bars, cost coverage lollipop, paradox dual-axis
 - `scripts/tb-chart.js` -- Triple Burden ADM2 choropleth maps + regional bar charts
 - `scripts/coverage-map.js` -- D3 choropleth for coverage slide
-- `scripts/cd-chart.js` -- Continental Drying charts (freshwater loss, land use, electricity/TWS)
+- `scripts/cd-chart.js` -- Continental Drying charts (electricity/TWS relationship)
+- `scripts/cd-map.js` -- Continental Drying raster map (GRACE satellite data, canvas renderer with mega-region click highlighting)
 - `scripts/main.js` -- Counter animations, slide event dispatch, fragment listeners
 
 ## Key Animations
-- **Tariff charts**: Regional lines draw slowly (2s, 200ms stagger) → fade to 30% opacity on arrow click → bold navy World Average line draws in (fragment-triggered)
-- **TB Venn**: Circles converge slowly (2.5s each) → on arrow click, Venn slides left and scales to 72%, explainer text fades in on right
+- **Tariff charts**: Regional lines draw slowly (2s, 200ms stagger), fade to 30% on arrow click, bold navy World Average draws in (fragment-triggered)
+- **TB Venn**: Circles converge slowly (2.5s each), on arrow click Venn slides left and scales to 72%, explainer fades in on right
 - **NRW bubbles**: 1.8s per bubble, 600ms stagger, eased cubic-out
-- **TB map circles animation**: 2.5s per circle with slower stagger delays
+- **Continental Drying book**: 3D book with cover opens, 2 pages flip (real PDF pages), zooms into book, map emerges
+- **CD mega-regions**: Click any mega-drying region to highlight it (SVG mask dims rest of map)
+- **Energy chart**: Popup explainer appears on arrow click
+
+## Slide Order (14 slides)
+1. Title (World Bank Group cover)
+2. Water Crisis Scale (JMP 2025 data, dark background)
+3. Continental Drying Map (3D book opening animation, GRACE satellite raster)
+4. Energy Pricing (electricity/TWS chart with popup)
+5. Triple Burden Concept (Venn diagram with slide-left explainer)
+6. Triple Burden Water Map (ADM2 choropleth, drought risk)
+7. Triple Burden Sanitation Map (ADM2 choropleth, flood risk)
+8. Spending Gap (external iframe)
+9. Budget Execution (external iframe)
+10. Tariffs Nominal (line chart with World Average fragment)
+11. NRW Efficiency (bubble chart, population-sized)
+12. Affordability (paired bar chart GDP vs B20)
+13. Agricultural Water Pricing (stats + text)
+14. Policy Recommendations (two-column left-border callouts)
 
 ## Data Preparation Scripts
 - `scripts-data/prepare_tb_data.py` -- Converts TB CSVs to `data/tb_data_countries.json`
-- `scripts-data/prepare_tb_geo.py` -- Converts GAD_ADM2 shapefile to dissolved GeoJSON (`data/tb_adm2_water.json`, `data/tb_adm2_sanitation.json`). Requires geopandas.
-- PPP tariff processing is done inline in hero-chart.js data loading (fetches `timeseries.json`)
+- `scripts-data/prepare_tb_geo.py` -- Converts GAD_ADM2 shapefile to dissolved GeoJSON. Requires geopandas.
+- Continental drying raster grid extracted via rasterio from GRACE TIFF (step=2 downsampling)
+- PPP tariff processing uses World Bank PA.NUS.PPP / PA.NUS.FCRF conversion factors
+- Affordability data extracted from IBNET portal countries.json (affordGdp vs affordB20)
 
 ## Rendering
 ```bash
