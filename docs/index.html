@@ -110,9 +110,7 @@
 </head>
 <body>
   <div class="gate">
-    <div class="logo">World Bank Group | Global Water Department</div>
     <h1>Water Services in Transition</h1>
-    <div class="subtitle">Spring Meetings 2026</div>
     <div class="divider"></div>
     <label for="pw">Enter access code to view the presentation</label>
     <input type="password" id="pw" placeholder="Access code" autofocus>
@@ -123,7 +121,7 @@
   <script>
     function check() {
       var pw = document.getElementById('pw').value;
-      if (pw === 'sm2026') {
+      if (pw === 'water-FY26') {
         sessionStorage.setItem('access', 'granted');
         window.location.href = 'presentation.html';
       } else {
