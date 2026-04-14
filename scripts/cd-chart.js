@@ -703,6 +703,7 @@
     "land-use-tws": renderLandUse,
     "energy-tws": function() { renderElectricityTWS("chart-energy-tws"); },
     "energy-pricing": function() { renderElectricityTWS("chart-energy-pricing"); },
+    "ag-pricing": function() { renderElectricityTWS("chart-energy-pricing"); },
   };
 
   async function handleSlide(id) {

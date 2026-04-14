@@ -28,7 +28,7 @@
       vertical-align: middle;
     }
   </style>
-  <link rel="stylesheet" href="presentation_files/libs/revealjs/dist/theme/quarto-e625eb3d7a47cb28203cdcca74fd0bc5.css">
+  <link rel="stylesheet" href="presentation_files/libs/revealjs/dist/theme/quarto-b9401da53eaa246521d3cbbc12ac5257.css">
   <link href="presentation_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="presentation_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="presentation_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -134,10 +134,6 @@
 <section id="title-custom" class="slide level2 title-slide center" data-background-color="#f8f5f0">
 <h2></h2>
 <div class="title-cover" style="display:flex; flex-direction:column; align-items:flex-start; justify-content:center; height:100%; padding:0 60px;">
-  <!-- WB Group Logo -->
-  <div style="margin-bottom:2.5em;">
-    <img src="images/wb-group-logo.svg" alt="World Bank Group" style="height:48px; opacity:0.85;">
-  </div>
   <!-- Decorative accent line -->
   <div style="width:100px; height:5px; background: linear-gradient(90deg, #8b1a2d, #b85c70); margin-bottom:1.8em; border-radius:3px;"></div>
   <!-- Main title -->
@@ -149,6 +145,50 @@
   <!-- Department & Event -->
   <div style="font-size:1.05em; color:#4a5568; font-weight:600; font-family:'Nunito', sans-serif;">World Bank Group | Global Water Department</div>
   <div style="font-size:0.9em; color:#6b7280; margin-top:0.6em; font-family:'Nunito', sans-serif; letter-spacing:0.04em;">Spring Meetings &nbsp;•&nbsp; April 2026</div>
+
+  <!-- Partner logos — bottom-right -->
+  <div style="position:absolute; bottom:40px; right:60px; display:flex; align-items:center; gap:28px;">
+    <img src="images/wbg-water-logo.png" alt="World Bank Group Water" style="height:90px;">
+    <img src="images/gwsp-logo.png" alt="GWSP" style="height:100px;">
+  </div>
+</div>
+<!-- ═══════════════════════════════════════════════════════════
+     WATER FORWARD (PLACEHOLDER)
+     ═══════════════════════════════════════════════════════════ -->
+</section>
+<section id="water-forward" class="slide level2" data-background-color="#f8f5f0">
+<h2></h2>
+<h3 id="water-forward-placeholder">Water Forward (placeholder)</h3>
+<!-- ═══════════════════════════════════════════════════════════
+     CONTINENTAL DRYING MAP — Two-column layout
+     ═══════════════════════════════════════════════════════════ -->
+</section>
+<section id="continental-drying" class="slide level2" data-background-color="#f8f5f0">
+<h2></h2>
+<div id="cd-slide-wrapper" style="position:relative; width:100%; height:920px; overflow:hidden;">
+
+  <!-- Title row -->
+  <div style="margin-bottom:0.3em;">
+    <h3 style="font-family:'Playfair Display', Georgia, serif; font-size:1.8em; font-weight:900; color:#8b1a2d; letter-spacing:-0.02em; border-bottom:4px solid; border-image:linear-gradient(90deg,#8b1a2d,#b85c70) 1; padding-bottom:0.25em; display:inline-block; margin:0;">Emergence of Continental-Scale Mega-Drying Regions</h3>
+    <p style="font-family:'Nunito', sans-serif; font-size:1.1em; color:#4a5568; line-height:1.35; margin:0.15em 0 0 0;">
+      Terrestrial freshwater availability is decreasing at an annual rate of <strong style="color:#1a3a5c;">324 billion cubic meters</strong>, enough to meet the annual water needs of <strong style="color:#1a3a5c;">280 million people</strong>.
+    </p>
+  </div>
+
+  <!-- Map + book cover -->
+  <div style="position:relative; height:700px;">
+    <div id="cd-map-container" style="width:100%; height:100%;"></div>
+
+    <!-- Book cover thumbnail — bottom-right corner -->
+    <div style="position:absolute; bottom:50px; right:16px; display:flex; flex-direction:column; align-items:center; z-index:10;">
+      <img src="images/cd_report_cover.png" alt="Continental Drying Report" style="width:150px; border-radius:4px; box-shadow:0 3px 12px rgba(0,0,0,0.25);">
+    </div>
+  </div>
+
+</div>
+
+<div style="font-size:0.6em; color:#6b7280; font-style:italic; margin-top:0.3em;">
+  Source: GRACE/GRACE-FO satellite data; Continental Drying — A Threat to Our Common Future, World Bank
 </div>
 <!-- ═══════════════════════════════════════════════════════════
      SCENE 1b: THE SCALE OF THE CRISIS — Animated Infographic
@@ -193,190 +233,6 @@
 </div>
 <div class="source source-light">
 <p>Source: WHO/UNICEF JMP (2025), World Bank</p>
-</div>
-<!-- ═══════════════════════════════════════════════════════════
-     SCENE 1b2: CONTINENTAL DRYING MAP
-     ═══════════════════════════════════════════════════════════ -->
-</section>
-<section id="continental-drying" class="slide level2" data-background-color="#f8f5f0">
-<h2></h2>
-<style>
-  #cd-book-scene { perspective: 1800px; width: 480px; height: 680px; }
-  #cd-book-3d {
-    position: relative; width: 100%; height: 100%;
-    transform-style: preserve-3d;
-    transform: rotateY(-15deg);
-  }
-  .cd-page {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    transform-origin: left center; backface-visibility: hidden;
-    transform-style: preserve-3d; overflow: hidden;
-    transition: transform 1.0s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .cd-spine {
-    position: absolute; top: 0; left: -20px; width: 20px; height: 100%;
-    background: linear-gradient(90deg, #1e1508, #3d2b0f, #4A3810);
-    transform: rotateY(90deg); transform-origin: right center; border-radius: 4px 0 0 4px;
-  }
-  .cd-back { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #f5f0e5; border-radius: 0 4px 4px 0; z-index: 0; transform: translateZ(-20px); }
-</style>
-
-<div id="cd-slide-wrapper" style="position:relative; width:100%; height:920px; overflow:hidden;">
-  <!-- Book overlay -->
-  <div id="cd-cover-layer" style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; z-index:20; background:#f5f0e5; transform-origin: center center;">
-    <div id="cd-book-scene">
-      <div id="cd-book-3d">
-        <div class="cd-spine"></div>
-        <!-- Back — cream page visible after all flips -->
-        <div class="cd-back" style="background:#f5f0e5;"></div>
-        <!-- Page 2 -->
-        <div class="cd-page" id="cd-pg2" style="z-index:3; background:#f2ece0; border-radius:0 3px 3px 0; box-shadow:2px 0 8px rgba(0,0,0,0.08);">
-          <img src="images/cd_page_2.png" style="width:100%; height:100%; object-fit:cover; opacity:0.7;">
-        </div>
-        <!-- Page 1 -->
-        <div class="cd-page" id="cd-pg1" style="z-index:4; background:#f5f0e5; border-radius:0 3px 3px 0; box-shadow:2px 0 8px rgba(0,0,0,0.06);">
-          <img src="images/cd_page_1.png" style="width:100%; height:100%; object-fit:cover; opacity:0.7;">
-        </div>
-        <!-- Front cover -->
-        <div class="cd-page" id="cd-cover-page" style="z-index:5;">
-          <img src="images/cd_report_cover.png" alt="Continental Drying" style="width:100%; height:100%; object-fit:cover; border-radius:0 6px 6px 0; box-shadow:8px 6px 30px rgba(0,0,0,0.35);">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Source — shown with map content -->
-  <div id="cd-source" style="position:absolute; bottom:20px; left:60px; font-size:0.6em; color:#6b7280; font-style:italic; opacity:0; z-index:5;">
-    Source: GRACE/GRACE-FO satellite data; Continental Drying — A Threat to Our Common Future, World Bank
-  </div>
-
-  <!-- Map content — hidden initially -->
-  <div id="cd-map-content" style="opacity:0;">
-    <h3 style="font-family:'Playfair Display', Georgia, serif; font-size:1.8em; font-weight:900; color:#8b1a2d; letter-spacing:-0.02em; border-bottom:4px solid; border-image:linear-gradient(90deg,#8b1a2d,#b85c70) 1; padding-bottom:0.25em; display:inline-block; margin:0 0 0.15em 0;">Emergence of Continental-Scale Mega-Drying Regions</h3>
-    <p style="font-family:'Nunito', sans-serif; font-size:1.0em; color:#4a5568; line-height:1.4; margin:0 0 0.2em 0;">
-      Terrestrial freshwater availability is decreasing at an annual rate of <strong style="color:#1a3a5c;">324 billion cubic meters</strong>, which is enough to meet the annual water needs of <strong style="color:#1a3a5c;">280 million people</strong>.
-    </p>
-    <div id="cd-map-container" style="width:100%; height:660px;"></div>
-  </div>
-
-  <!-- Fragment trigger -->
-  <div class="fragment cd-cover-trigger" data-fragment-index="0"></div>
-</div>
-
-<script>
-(function() {
-  function setup() {
-    var cdTimers = [];
-
-    function resetBook() {
-      cdTimers.forEach(clearTimeout);
-      cdTimers = [];
-      var ids = ['cd-cover-page', 'cd-pg1', 'cd-pg2'];
-      ids.forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) { el.style.transition = 'none'; el.style.transform = 'rotateY(0deg)'; }
-      });
-      var book = document.getElementById('cd-book-3d');
-      if (book) { book.style.transition = 'none'; book.style.transform = 'rotateY(-15deg)'; }
-      var layer = document.getElementById('cd-cover-layer');
-      if (layer) { layer.style.transition = 'none'; layer.style.transform = 'scale(1)'; layer.style.opacity = '1'; layer.style.pointerEvents = 'auto'; layer.style.background = '#f5f0e5'; }
-      var content = document.getElementById('cd-map-content');
-      if (content) { content.style.transition = 'none'; content.style.opacity = '0'; }
-      var source = document.getElementById('cd-source');
-      if (source) { source.style.transition = 'none'; source.style.opacity = '0'; }
-      var source = document.getElementById('cd-source');
-      if (source) { source.style.transition = 'none'; source.style.opacity = '0'; }
-    }
-
-    function openBook() {
-      resetBook();
-      var cover = document.getElementById('cd-cover-page');
-      var pg1 = document.getElementById('cd-pg1');
-      var pg2 = document.getElementById('cd-pg2');
-      var book = document.getElementById('cd-book-3d');
-      var layer = document.getElementById('cd-cover-layer');
-      var content = document.getElementById('cd-map-content');
-      var source = document.getElementById('cd-source');
-
-      // Force reflow
-      void cover.offsetHeight;
-
-      // 0ms: Straighten book
-      book.style.transition = 'transform 0.6s ease-out';
-      book.style.transform = 'rotateY(0deg)';
-
-      // 400ms: Cover opens
-      cdTimers.push(setTimeout(function() {
-        cover.style.transition = 'transform 1.2s cubic-bezier(0.4, 0, 0.2, 1)';
-        cover.style.transform = 'rotateY(-170deg)';
-      }, 400));
-
-      // 1600ms: Page 1 flips
-      cdTimers.push(setTimeout(function() {
-        pg1.style.transition = 'transform 0.9s cubic-bezier(0.3, 0, 0.2, 1)';
-        pg1.style.transform = 'rotateY(-165deg)';
-      }, 1600));
-
-      // 2400ms: Page 2 flips
-      cdTimers.push(setTimeout(function() {
-        pg2.style.transition = 'transform 0.9s cubic-bezier(0.3, 0, 0.2, 1)';
-        pg2.style.transform = 'rotateY(-160deg)';
-      }, 2400));
-
-      // 3400ms: Zoom into book (cream back page scales up)
-      cdTimers.push(setTimeout(function() {
-        layer.style.transition = 'transform 1.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s 0.6s ease-out';
-        layer.style.transform = 'scale(5)';
-        layer.style.opacity = '0';
-        layer.style.pointerEvents = 'none';
-      }, 3400));
-
-      // 4200ms: Map emerges
-      cdTimers.push(setTimeout(function() {
-        content.style.transition = 'opacity 0.8s ease-out';
-        content.style.opacity = '1';
-        var source = document.getElementById('cd-source');
-        if (source) { source.style.transition = 'opacity 0.6s ease-out'; source.style.opacity = '1'; }
-      }, 4200));
-    }
-
-    Reveal.on('fragmentshown', function(ev) {
-      if (ev.fragment.classList.contains('cd-cover-trigger')) openBook();
-    });
-    Reveal.on('fragmenthidden', function(ev) {
-      if (ev.fragment.classList.contains('cd-cover-trigger')) resetBook();
-    });
-    // Reset when leaving the slide
-    Reveal.on('slidechanged', function(ev) {
-      if (ev.previousSlide && ev.previousSlide.id === 'continental-drying') resetBook();
-    });
-  }
-
-  if (typeof Reveal !== 'undefined' && Reveal.isReady && Reveal.isReady()) setup();
-  else if (typeof Reveal !== 'undefined') Reveal.on('ready', setup);
-  else document.addEventListener('DOMContentLoaded', function() { setTimeout(setup, 500); });
-})();
-</script>
-<!-- ═══════════════════════════════════════════════════════════
-     SCENE 1b3: ENERGY PRICING & WATER DEPLETION
-     ═══════════════════════════════════════════════════════════ -->
-</section>
-<section id="energy-pricing" class="slide level2" data-background-color="#f8f5f0">
-<h2></h2>
-<h3 id="energy-subsidies-accelerate-groundwater-depletion">Energy Subsidies Accelerate Groundwater Depletion</h3>
-<div style="position:relative; height:840px;">
-  <div id="chart-energy-pricing" class="chart-container" style="height:780px; overflow:visible;"></div>
-
-  <!-- Explainer popup — appears on arrow click -->
-  <div id="energy-explainer" class="fragment fade-up" data-fragment-index="0" style="position:absolute; top:100px; right:30px; width:420px; background:rgba(248,245,240,0.97); border:2px solid #8b1a2d; border-radius:12px; padding:28px 32px; box-shadow:0 8px 30px rgba(0,0,0,0.15); z-index:10;">
-    <div style="font-family:'Playfair Display', Georgia, serif; font-size:1.1em; font-weight:900; color:#8b1a2d; margin-bottom:0.5em; line-height:1.2;">Why This Matters</div>
-    <p style="font-family:'Nunito', sans-serif; font-size:0.92em; color:#4a5568; line-height:1.5; margin:0;">
-      Energy subsidies make groundwater pumping artificially cheap, accelerating depletion. Correcting these pricing distortions is one of the most effective levers to preserve freshwater resources.
-    </p>
-  </div>
-</div>
-<div class="source">
-<p>Source: Continental Drying — A Threat to Our Common Future, World Bank</p>
 </div>
 <!-- ═══════════════════════════════════════════════════════════
      SCENE 1c: TRIPLE BURDEN CONCEPT — Converging Circles
@@ -443,18 +299,6 @@
   </svg>
   </div>
 
-  <!-- Explainer text (right side, hidden initially) -->
-  <div id="tb-explainer" style="position:absolute; top:0; left:56%; width:41%; height:100%; display:flex; flex-direction:column; justify-content:center; padding:40px 40px 40px 0; opacity:0; transform:translateX(40px); transition: opacity 0.8s 0.6s ease-out, transform 0.8s 0.6s ease-out;">
-    <div class="fragment fade-up" data-fragment-index="0" style="margin-bottom:1.2em;">
-      <div style="font-size:1.35em; font-weight:700; color:#8b1a2d; line-height:1.2; font-family:'Playfair Display', Georgia, serif;">Areas experiencing the Triple Burden are the most vulnerable</div>
-    </div>
-    <div class="fragment fade-up" data-fragment-index="1" style="margin-bottom:1.0em; padding-left:1.2em; border-left:4px solid #b85c70;">
-      <p style="font-size:1.0em; color:#4a5568; line-height:1.45; margin:0;">Poor water and sanitation access combined with poverty creates a <strong style="color:#1a3a5c;">poverty trap</strong>, increasing mortality, stalling human capital, and reducing earnings across generations.</p>
-    </div>
-    <div class="fragment fade-up" data-fragment-index="2" style="padding-left:1.2em; border-left:4px solid #2e6da4;">
-      <p style="font-size:1.0em; color:#4a5568; line-height:1.45; margin:0;">Those trapped are <strong style="color:#1a3a5c;">less resilient to climate shocks</strong>. Water infrastructure is vulnerable to droughts and floods, while poor sanitation generates emissions that worsen climate risks.</p>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -464,10 +308,6 @@
     if (typeof Reveal === 'undefined') return;
     // TB Venn slide-left
     Reveal.on('fragmentshown', function(ev) {
-      if (ev.fragment.closest && ev.fragment.closest('#tb-layout')) {
-        document.getElementById('tb-venn').classList.replace('tb-venn-centered', 'tb-venn-shifted');
-        document.getElementById('tb-explainer').classList.add('tb-explainer-visible');
-      }
       // World line trigger on tariff charts
       if (ev.fragment.classList.contains('world-line-trigger')) {
         var chartId = ev.fragment.getAttribute('data-chart');
@@ -476,13 +316,6 @@
       }
     });
     Reveal.on('fragmenthidden', function(ev) {
-      if (ev.fragment.closest && ev.fragment.closest('#tb-layout')) {
-        var remaining = document.querySelectorAll('#tb-layout .fragment.visible');
-        if (remaining.length === 0) {
-          document.getElementById('tb-venn').classList.replace('tb-venn-shifted', 'tb-venn-centered');
-          document.getElementById('tb-explainer').classList.remove('tb-explainer-visible');
-        }
-      }
       // Hide World line
       if (ev.fragment.classList.contains('world-line-trigger')) {
         var chartId = ev.fragment.getAttribute('data-chart');
@@ -509,7 +342,7 @@
 </section>
 <section id="triple-burden-water" class="slide level2">
 <h2></h2>
-<h3 id="in-developing-countries-1.1-billion-people-17.4-live-under-high-poverty-high-risk-of-droughts-and-low-access-to-water-services">In developing countries, 1.1 billion people (17.4%) live under high poverty, high risk of droughts, and low access to water services</h3>
+<h3 style="font-size:1.35em" id="high-poverty-high-risk-of-droughts-and-low-access-to-water-services">High <span style="color:#8b1a2d">poverty</span>, high risk of <span style="color:#8b1a2d">droughts</span>, and low access to <span style="color:#8b1a2d">water</span> services</h3>
 <div id="tb-map-water" style="width:100%; height:840px; position:relative;"></div>
 <!-- ═══════════════════════════════════════════════════════════
      SCENE 3: TRIPLE BURDEN — SANITATION MAP
@@ -517,7 +350,7 @@
 </section>
 <section id="triple-burden-sanitation" class="slide level2">
 <h2></h2>
-<h3 id="billion-people-live-under-high-poverty-high-risk-of-flooding-and-low-access-to-sanitation-services">1.1 billion people live under high poverty, high risk of flooding, and low access to sanitation services</h3>
+<h3 style="font-size:1.35em" id="high-poverty-high-risk-of-floods-and-low-access-to-sanitation-services">High <span style="color:#8b1a2d">poverty</span>, high risk of <span style="color:#8b1a2d">floods</span>, and low access to <span style="color:#8b1a2d">sanitation</span> services</h3>
 <div id="tb-map-sanitation" style="width:100%; height:840px; position:relative;"></div>
 <!-- ═══════════════════════════════════════════════════════════
      SCENE 5: SPENDING GAP
@@ -606,21 +439,9 @@
 
   </div>
 
-  <!-- Right: explanation -->
-  <div style="flex:1;">
-
-    <div class="fragment fade-up" data-fragment-index="2" style="margin-bottom:1.4em; padding-left:1.2em; border-left:4px solid #b85c70;">
-      <p style="font-family:'Nunito', sans-serif; font-size:0.95em; color:#4a5568; line-height:1.55; margin:0;">
-        Agricultural water is <strong style="color:#8b1a2d;">rarely priced or metered</strong>. Fixed-charge systems do not encourage conservation, because costs are often unrelated to actual consumption.
-      </p>
-    </div>
-
-    <div class="fragment fade-up" data-fragment-index="3" style="padding-left:1.2em; border-left:4px solid #2e6da4;">
-      <p style="font-family:'Nunito', sans-serif; font-size:0.95em; color:#4a5568; line-height:1.55; margin:0;">
-        Current agricultural pricing structures often <strong style="color:#1a3a5c;">fail to reflect scarcity</strong> or create strong incentives for conservation in the largest water-using sector.
-      </p>
-    </div>
-
+  <!-- Right: energy pricing chart -->
+  <div style="flex:1; position:relative;">
+    <div id="chart-energy-pricing" class="chart-container" style="height:720px; overflow:visible;"></div>
   </div>
 
 </div>
@@ -683,6 +504,27 @@
 <p>Source: WSIP 2025; World Bank Water Tariff Roadmap 2026</p>
 </div>
 <!-- ═══════════════════════════════════════════════════════════
+     THANK YOU
+     ═══════════════════════════════════════════════════════════ -->
+</section>
+<section id="thank-you" class="slide level2 title-slide center" data-background-color="#f8f5f0">
+<h2></h2>
+<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center;">
+  <!-- Decorative accent line -->
+  <div style="width:100px; height:5px; background: linear-gradient(90deg, #8b1a2d, #b85c70); margin-bottom:1.5em; border-radius:3px;"></div>
+  <!-- Thank you title -->
+  <h1 style="font-size:4em; font-weight:900; letter-spacing:-0.03em; color:#8b1a2d; margin:0 0 0.3em 0; line-height:1.05; font-family:'Playfair Display', Georgia, serif;">Thank You</h1>
+  <!-- Subtitle -->
+  <div style="font-size:1.4em; color:#1a3a5c; font-weight:700; font-family:'Playfair Display', Georgia, serif; letter-spacing:-0.01em;">World Bank Group | Global Water Department</div>
+  <div style="font-size:1.0em; color:#6b7280; margin-top:0.8em; font-family:'Nunito', sans-serif; letter-spacing:0.04em;">Spring Meetings &nbsp;•&nbsp; April 2026</div>
+
+  <!-- Partner logos — bottom-right -->
+  <div style="position:absolute; bottom:40px; right:60px; display:flex; align-items:center; gap:28px;">
+    <img src="images/wbg-water-logo.png" alt="World Bank Group Water" style="height:90px;">
+    <img src="images/gwsp-logo.png" alt="GWSP" style="height:100px;">
+  </div>
+</div>
+<!-- ═══════════════════════════════════════════════════════════
      SCRIPTS (loaded at end for performance)
      ═══════════════════════════════════════════════════════════ -->
 <script src="scripts/main.js?v=6"></script>
@@ -693,7 +535,7 @@
 <script src="scripts/tb-chart.js?v=5"></script>
 <script>
 // Robust chart dispatch — runs after all scripts load
-var CD_SLIDES = ['freshwater-loss', 'land-use-tws', 'energy-tws', 'energy-pricing'];
+var CD_SLIDES = ['freshwater-loss', 'land-use-tws', 'energy-tws', 'ag-pricing'];
 (function() {
   function setup() {
     Reveal.on('slidechanged', function(ev) {

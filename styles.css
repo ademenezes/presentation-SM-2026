@@ -645,18 +645,10 @@
   font-weight: 700;
 }
 
-/* ── Triple Burden Venn slide-left transition ──────────────── */
+/* ── Triple Burden Venn — centered (no slide-left) ──────────── */
 #tb-venn.tb-venn-centered {
   transform: translateX(0) scale(1);
   transform-origin: center center;
-}
-#tb-venn.tb-venn-shifted {
-  transform: translateX(-25%) scale(0.72);
-  transform-origin: center center;
-}
-#tb-explainer.tb-explainer-visible {
-  opacity: 1 !important;
-  transform: translateX(0) !important;
 }
 
 /* ── Background iframe fit ──────────────────────────────────── */

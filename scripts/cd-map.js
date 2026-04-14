@@ -38,8 +38,8 @@
     if (!container) return;
     container.innerHTML = "";
 
-    const W = 1920 * 0.95;
-    const H = 1080 * 0.62;
+    const W = container.clientWidth || 1920 * 0.95;
+    const H = container.clientHeight || 1080 * 0.62;
     const FONT = "'Nunito', -apple-system, sans-serif";
     const FONT_HEADING = "'Playfair Display', Georgia, serif";
 
@@ -102,68 +102,6 @@
     pathCtx.context(ctx)(world.features[0]);
     ctx.fill();
     ctx.restore();
-
-    // Dimming overlay — covers everything, clipped by selected region
-    const dimOverlay = svg.append("rect")
-      .attr("width", W).attr("height", H)
-      .attr("fill", "rgba(248,245,240,0.7)")
-      .attr("opacity", 0)
-      .style("pointer-events", "none");
-
-    // Clip path for the selected region (will be updated on click)
-    const clipDef = svg.append("defs").append("clipPath").attr("id", "cd-region-clip");
-    const clipRect = clipDef.append("rect").attr("width", W).attr("height", H); // default: full area
-    const clipRegionPath = clipDef.append("path").attr("d", "");
-
-    // Bright copy of canvas rendered inside the clip — SVG foreignObject
-    // Instead, use an inverted approach: dim everything, then cut out the selected region
-    // We use a mask: white = visible (dimmed), black = cut-out (shows through)
-    const maskDef = svg.append("defs").append("mask").attr("id", "cd-dim-mask");
-    maskDef.append("rect").attr("width", W).attr("height", H).attr("fill", "white");
-    const maskCutout = maskDef.append("path").attr("fill", "black").attr("d", "");
-
-    dimOverlay.attr("mask", "url(#cd-dim-mask)");
-
-    // Draw mega-region boundaries — thick dark brown like original
-    let activeRegion = null;
-    const regionPaths = svg.selectAll("path.region")
-      .data(regions.features)
-      .enter().append("path")
-      .attr("class", "region")
-      .attr("d", path)
-      .attr("fill", "rgba(0,0,0,0)")
-      .attr("stroke", "#3d2b1f")
-      .attr("stroke-width", 2.5)
-      .attr("stroke-opacity", 0.85)
-      .style("cursor", "pointer")
-      .on("click", function (event, d) {
-        event.stopPropagation();
-        if (activeRegion === d) {
-          // Deselect
-          activeRegion = null;
-          maskCutout.attr("d", "");
-          dimOverlay.transition().duration(400).attr("opacity", 0);
-          regionPaths.transition().duration(400).attr("stroke-width", 2.5).attr("stroke", "#3d2b1f");
-        } else {
-          // Select this region — highlight it
-          activeRegion = d;
-          maskCutout.attr("d", path(d));
-          dimOverlay.transition().duration(400).attr("opacity", 1);
-          regionPaths.transition().duration(300)
-            .attr("stroke-width", function (rd) { return rd === d ? 4 : 1.5; })
-            .attr("stroke", function (rd) { return rd === d ? "#1a3a5c" : "#999"; });
-        }
-      });
-
-    // Click on background to deselect
-    svg.on("click", function () {
-      if (activeRegion) {
-        activeRegion = null;
-        maskCutout.attr("d", "");
-        dimOverlay.transition().duration(400).attr("opacity", 0);
-        regionPaths.transition().duration(400).attr("stroke-width", 2.5).attr("stroke", "#3d2b1f");
-      }
-    });
 
     // Legend bar
     const legendW = 360, legendH = 16;

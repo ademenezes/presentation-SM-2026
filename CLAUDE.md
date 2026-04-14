@@ -67,32 +67,31 @@ Use official World Bank Group region names (not abbreviations with "&"):
 - `scripts/tb-chart.js` -- Triple Burden ADM2 choropleth maps + regional bar charts
 - `scripts/coverage-map.js` -- D3 choropleth for coverage slide
 - `scripts/cd-chart.js` -- Continental Drying charts (electricity/TWS relationship)
-- `scripts/cd-map.js` -- Continental Drying raster map (GRACE satellite data, canvas renderer with mega-region click highlighting)
+- `scripts/cd-map.js` -- Continental Drying raster map (GRACE satellite data, canvas renderer, container-relative sizing)
 - `scripts/main.js` -- Counter animations, slide event dispatch, fragment listeners
 
 ## Key Animations
 - **Tariff charts**: Regional lines draw slowly (2s, 200ms stagger), fade to 30% on arrow click, bold navy World Average draws in (fragment-triggered)
-- **TB Venn**: Circles converge slowly (2.5s each), on arrow click Venn slides left and scales to 72%, explainer fades in on right
+- **TB Venn**: Circles converge slowly (2.5s each), centered on slide (no slide-left/explainer)
 - **NRW bubbles**: 1.8s per bubble, 600ms stagger, eased cubic-out
-- **Continental Drying book**: 3D book with cover opens, 2 pages flip (real PDF pages), zooms into book, map emerges
-- **CD mega-regions**: Click any mega-drying region to highlight it (SVG mask dims rest of map)
-- **Energy chart**: Popup explainer appears on arrow click
+- **Continental Drying map**: Renders immediately on slide entry (no book animation, no mega-region outlines)
 
-## Slide Order (14 slides)
-1. Title (World Bank Group cover)
-2. Water Crisis Scale (JMP 2025 data, dark background)
-3. Continental Drying Map (3D book opening animation, GRACE satellite raster)
-4. Energy Pricing (electricity/TWS chart with popup)
-5. Triple Burden Concept (Venn diagram with slide-left explainer)
-6. Triple Burden Water Map (ADM2 choropleth, drought risk)
-7. Triple Burden Sanitation Map (ADM2 choropleth, flood risk)
+## Slide Order (15 slides)
+1. Title (cover with WBG Water + GWSP logos bottom-right)
+2. Water Forward (placeholder)
+3. Continental Drying Map (GRACE satellite raster, book cover thumbnail)
+4. Water Crisis Scale (JMP 2025 data, dark background)
+5. Triple Burden Concept (Venn diagram, centered)
+6. Triple Burden Water Map (ADM2 choropleth — poverty, droughts, water)
+7. Triple Burden Sanitation Map (ADM2 choropleth — poverty, floods, sanitation)
 8. Spending Gap (external iframe)
 9. Budget Execution (external iframe)
 10. Tariffs Nominal (line chart with World Average fragment)
 11. NRW Efficiency (bubble chart, population-sized)
 12. Affordability (paired bar chart GDP vs B20)
-13. Agricultural Water Pricing (stats + text)
+13. Agricultural Water Pricing (stats left + energy pricing chart right)
 14. Policy Recommendations (two-column left-border callouts)
+15. Thank You (with WBG Water + GWSP logos bottom-right)
 
 ## Data Preparation Scripts
 - `scripts-data/prepare_tb_data.py` -- Converts TB CSVs to `data/tb_data_countries.json`
