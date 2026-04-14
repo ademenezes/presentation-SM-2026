@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Water Services in Transition | World Bank Spring Meetings 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f8f5f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #282c34;
+    }
+    .gate {
+      text-align: center;
+      max-width: 480px;
+      padding: 60px 40px;
+    }
+    .logo {
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6b7280;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 2em;
+    }
+    h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 2.4em;
+      font-weight: 900;
+      color: #8b1a2d;
+      line-height: 1.1;
+      margin-bottom: 0.3em;
+    }
+    .subtitle {
+      font-size: 1.1em;
+      color: #1a3a5c;
+      font-weight: 600;
+      margin-bottom: 2.5em;
+    }
+    .divider {
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, #8b1a2d, #b85c70);
+      margin: 0 auto 2em;
+      border-radius: 2px;
+    }
+    label {
+      display: block;
+      font-size: 0.85em;
+      color: #6b7280;
+      margin-bottom: 0.5em;
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 14px 18px;
+      font-size: 1.1em;
+      font-family: 'Nunito', sans-serif;
+      border: 2px solid #c8d8e4;
+      border-radius: 8px;
+      background: #fff;
+      color: #282c34;
+      text-align: center;
+      letter-spacing: 0.15em;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    input[type="password"]:focus {
+      border-color: #1a3a5c;
+    }
+    input[type="password"].error {
+      border-color: #8b1a2d;
+      animation: shake 0.4s ease;
+    }
+    button {
+      margin-top: 1em;
+      padding: 14px 48px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1em;
+      font-weight: 700;
+      color: #fff;
+      background: #1a3a5c;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover { background: #2e6da4; }
+    .hint {
+      font-size: 0.75em;
+      color: #b85c70;
+      margin-top: 0.8em;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .hint.visible { opacity: 1; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="gate">
+    <div class="logo">World Bank Group | Global Water Department</div>
+    <h1>Water Services in Transition</h1>
+    <div class="subtitle">Spring Meetings 2026</div>
+    <div class="divider"></div>
+    <label for="pw">Enter access code to view the presentation</label>
+    <input type="password" id="pw" placeholder="Access code" autofocus>
+    <br>
+    <button onclick="check()">Enter</button>
+    <div class="hint" id="hint">Incorrect code. Please try again.</div>
+  </div>
+  <script>
+    function check() {
+      var pw = document.getElementById('pw').value;
+      if (pw === 'sm2026') {
+        sessionStorage.setItem('access', 'granted');
+        window.location.href = 'presentation.html';
+      } else {
+        document.getElementById('pw').classList.add('error');
+        document.getElementById('hint').classList.add('visible');
+        setTimeout(function() {
+          document.getElementById('pw').classList.remove('error');
+        }, 400);
+      }
+    }
+    document.getElementById('pw').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') check();
+    });
+  </script>
+</body>
+</html>
