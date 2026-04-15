@@ -410,15 +410,11 @@
     if (!container) return;
     container.innerHTML = "";
 
-    let rawData = await fetch("data/affordability_gap.json?v=1").then(r => r.json());
-    if (!rawData || !rawData.length) return;
-
-    // Filter to interesting cases and limit
-    const data = rawData.filter(d => d.affordB20 > 3).slice(0, 10);
-    if (!data.length) return;
+    const data = await fetch("data/affordability_by_income.json?v=1").then(r => r.json());
+    if (!data || !data.length) return;
 
     const { W, H } = getDimensions();
-    const MARGIN = { top: 100, right: 120, bottom: 60, left: 260 };
+    const MARGIN = { top: 100, right: 140, bottom: 60, left: 320 };
     const width = W - MARGIN.left - MARGIN.right;
     const height = H - MARGIN.top - MARGIN.bottom;
     const FONT = "'Nunito', -apple-system, sans-serif";
@@ -430,17 +426,17 @@
     // Title
     svg.append("text").attr("x", MARGIN.left).attr("y", 38)
       .attr("fill", "#8b1a2d").attr("font-size", "36px").attr("font-weight", "900")
-      .attr("font-family", FONT_H).text("Tariffs Are Low on Average : But Not for the Poor");
+      .attr("font-family", FONT_H).text("Water Is Affordable on Average, But Not for the Poor");
     svg.append("text").attr("x", MARGIN.left).attr("y", 72)
       .attr("fill", "#4a5568").attr("font-size", "20px")
-      .attr("font-family", FONT).text("Monthly water bill (15 m\u00b3) as % of income \u00b7 National average vs bottom 20%");
+      .attr("font-family", FONT).text("Median water bill (15 m\u00b3) as % of income by World Bank income group");
 
     const yBand = d3.scaleBand()
-      .domain(data.map(d => d.name))
+      .domain(data.map(d => d.group))
       .range([0, height])
-      .padding(0.3);
+      .padding(0.35);
 
-    const maxVal = Math.min(d3.max(data, d => d.affordB20), 45);
+    const maxVal = 40;
     const xScale = d3.scaleLinear().domain([0, maxVal]).range([0, width]);
 
     // Grid
@@ -451,64 +447,70 @@
     // WHO 3% threshold
     g.append("line").attr("x1", xScale(3)).attr("x2", xScale(3))
       .attr("y1", -10).attr("y2", height + 10)
-      .attr("stroke", "#b85c70").attr("stroke-width", 2).attr("stroke-dasharray", "8,4");
-    g.append("text").attr("x", xScale(3) + 6).attr("y", -4)
-      .attr("fill", "#b85c70").attr("font-size", "14px").attr("font-weight", "600")
-      .attr("font-family", FONT).text("3% WHO threshold");
+      .attr("stroke", "#b85c70").attr("stroke-width", 2.5).attr("stroke-dasharray", "8,4");
+    g.append("text").attr("x", xScale(3) + 8).attr("y", -6)
+      .attr("fill", "#b85c70").attr("font-size", "16px").attr("font-weight", "700")
+      .attr("font-family", FONT).text("3% affordability threshold");
 
     // X axis
     g.append("g").attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(xScale).ticks(5).tickFormat(d => d + "%"))
-      .selectAll("text").attr("fill", "#6b7280").attr("font-size", "18px");
+      .selectAll("text").attr("fill", "#6b7280").attr("font-size", "20px");
     g.selectAll(".domain").remove();
     g.selectAll(".tick line").attr("stroke", "rgba(0,0,0,0.1)");
 
     // Bars
-    const barH = yBand.bandwidth() / 2 - 2;
+    const barH = yBand.bandwidth() / 2 - 3;
 
     data.forEach((d, i) => {
-      const y = yBand(d.name);
+      const y = yBand(d.group);
       const gdpVal = Math.min(d.affordGdp, maxVal);
       const b20Val = Math.min(d.affordB20, maxVal);
 
-      // Country label
-      g.append("text").attr("x", -12).attr("y", y + yBand.bandwidth() / 2 + 5)
+      // Income group label
+      g.append("text").attr("x", -14).attr("y", y + yBand.bandwidth() / 2 - 4)
         .attr("text-anchor", "end").attr("fill", "#282c34")
-        .attr("font-size", "17px").attr("font-weight", "600").attr("font-family", FONT)
-        .text(d.name);
+        .attr("font-size", "22px").attr("font-weight", "700").attr("font-family", FONT)
+        .text(d.group);
+      // Country count
+      g.append("text").attr("x", -14).attr("y", y + yBand.bandwidth() / 2 + 18)
+        .attr("text-anchor", "end").attr("fill", "#6b7280")
+        .attr("font-size", "16px").attr("font-weight", "400").attr("font-family", FONT)
+        .text("n = " + d.nCountries + " countries");
 
       // GDP bar (navy — national average)
       g.append("rect").attr("x", 0).attr("y", y)
-        .attr("width", 0).attr("height", barH).attr("rx", 3)
-        .attr("fill", "#1a3a5c").attr("fill-opacity", 0.8)
-        .transition().duration(800).delay(200 + i * 80)
+        .attr("width", 0).attr("height", barH).attr("rx", 4)
+        .attr("fill", "#1a3a5c").attr("fill-opacity", 0.85)
+        .transition().duration(800).delay(200 + i * 150)
         .attr("width", xScale(gdpVal));
 
       // B20 bar (maroon — bottom 20%)
-      g.append("rect").attr("x", 0).attr("y", y + barH + 4)
-        .attr("width", 0).attr("height", barH).attr("rx", 3)
-        .attr("fill", "#8b1a2d").attr("fill-opacity", 0.8)
-        .transition().duration(800).delay(300 + i * 80)
+      g.append("rect").attr("x", 0).attr("y", y + barH + 6)
+        .attr("width", 0).attr("height", barH).attr("rx", 4)
+        .attr("fill", "#8b1a2d").attr("fill-opacity", 0.85)
+        .transition().duration(800).delay(300 + i * 150)
         .attr("width", xScale(b20Val));
 
       // Value labels
-      g.append("text").attr("x", xScale(gdpVal) + 8).attr("y", y + barH / 2 + 4)
-        .attr("fill", "#1a3a5c").attr("font-size", "14px").attr("font-weight", "600")
+      g.append("text").attr("x", xScale(gdpVal) + 10).attr("y", y + barH / 2 + 5)
+        .attr("fill", "#1a3a5c").attr("font-size", "18px").attr("font-weight", "700")
         .attr("font-family", FONT).text(d.affordGdp.toFixed(1) + "%")
-        .attr("opacity", 0).transition().duration(400).delay(600 + i * 80).attr("opacity", 1);
+        .attr("opacity", 0).transition().duration(400).delay(600 + i * 150).attr("opacity", 1);
 
-      g.append("text").attr("x", xScale(b20Val) + 8).attr("y", y + barH + 4 + barH / 2 + 4)
-        .attr("fill", "#8b1a2d").attr("font-size", "14px").attr("font-weight", "600")
-        .attr("font-family", FONT).text((d.affordB20 > maxVal ? ">" + maxVal : d.affordB20.toFixed(1)) + "%")
-        .attr("opacity", 0).transition().duration(400).delay(700 + i * 80).attr("opacity", 1);
+      var b20Label = d.affordB20 > maxVal ? ">" + maxVal + "%" : d.affordB20.toFixed(1) + "%";
+      g.append("text").attr("x", xScale(b20Val) + 10).attr("y", y + barH + 6 + barH / 2 + 5)
+        .attr("fill", "#8b1a2d").attr("font-size", "18px").attr("font-weight", "700")
+        .attr("font-family", FONT).text(b20Label)
+        .attr("opacity", 0).transition().duration(400).delay(700 + i * 150).attr("opacity", 1);
     });
 
     // Legend
-    const legG = svg.append("g").attr("transform", `translate(${MARGIN.left + width - 300}, ${MARGIN.top - 20})`);
-    legG.append("rect").attr("width", 14).attr("height", 14).attr("rx", 2).attr("fill", "#1a3a5c").attr("fill-opacity", 0.8);
-    legG.append("text").attr("x", 20).attr("y", 12).attr("fill", "#4a5568").attr("font-size", "15px").attr("font-family", FONT).text("National average (% of GDP pc)");
-    legG.append("rect").attr("y", 22).attr("width", 14).attr("height", 14).attr("rx", 2).attr("fill", "#8b1a2d").attr("fill-opacity", 0.8);
-    legG.append("text").attr("x", 20).attr("y", 34).attr("fill", "#4a5568").attr("font-size", "15px").attr("font-family", FONT).text("Bottom 20% income group");
+    const legG = svg.append("g").attr("transform", `translate(${MARGIN.left + width - 360}, ${MARGIN.top - 22})`);
+    legG.append("rect").attr("width", 16).attr("height", 16).attr("rx", 3).attr("fill", "#1a3a5c").attr("fill-opacity", 0.85);
+    legG.append("text").attr("x", 24).attr("y", 13).attr("fill", "#4a5568").attr("font-size", "17px").attr("font-family", FONT).text("National average (% of GDP per capita)");
+    legG.append("rect").attr("y", 26).attr("width", 16).attr("height", 16).attr("rx", 3).attr("fill", "#8b1a2d").attr("fill-opacity", 0.85);
+    legG.append("text").attr("x", 24).attr("y", 39).attr("fill", "#4a5568").attr("font-size", "17px").attr("font-family", FONT).text("Bottom 20% income group");
   }
 
   // ═══════════════════════════════════════════════════════════

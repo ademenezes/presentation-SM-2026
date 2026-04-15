@@ -1,0 +1,26 @@
+[
+  {
+    "group": "Low income",
+    "affordGdp": 2.86,
+    "affordB20": 33.93,
+    "nCountries": 15
+  },
+  {
+    "group": "Lower middle income",
+    "affordGdp": 1.25,
+    "affordB20": 12.58,
+    "nCountries": 43
+  },
+  {
+    "group": "Upper middle income",
+    "affordGdp": 0.4,
+    "affordB20": 4.07,
+    "nCountries": 40
+  },
+  {
+    "group": "High income",
+    "affordGdp": 0.56,
+    "affordB20": 3.65,
+    "nCountries": 43
+  }
+]

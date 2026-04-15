@@ -470,48 +470,60 @@
     const svg = d3.select(container).append("svg").attr("width", W).attr("height", H);
     const g = svg.append("g").attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
 
-    const xScale = d3.scaleLinear().domain([-150, 155]).range([0, width]);
+    const xScale = d3.scaleLinear().domain([-150, 150]).range([0, width]);
     const yScale = d3.scaleLinear().domain([-45, 45]).range([height, 0]);
 
-    // Gridlines
+    // Gridlines (gainsboro like R theme_minimal)
     g.append("g")
-      .selectAll("line")
-      .data(yScale.ticks(5))
+      .selectAll("line.ygrid")
+      .data([-40, -20, 0, 20, 40])
       .enter()
       .append("line")
       .attr("x1", 0)
       .attr("x2", width)
       .attr("y1", (d) => yScale(d))
       .attr("y2", (d) => yScale(d))
-      .attr("stroke", "rgba(0,0,0,0.06)");
+      .attr("stroke", "gainsboro")
+      .attr("stroke-width", 0.5);
+    g.append("g")
+      .selectAll("line.xgrid")
+      .data([-150, -100, -50, 0, 50, 100, 150])
+      .enter()
+      .append("line")
+      .attr("x1", (d) => xScale(d))
+      .attr("x2", (d) => xScale(d))
+      .attr("y1", 0)
+      .attr("y2", height)
+      .attr("stroke", "gainsboro")
+      .attr("stroke-width", 0.5);
 
-    // Zero lines
+    // Zero reference lines (red, dashed, matching R: alpha=0.5, linewidth=0.5)
     g.append("line")
       .attr("x1", xScale(0))
       .attr("x2", xScale(0))
       .attr("y1", 0)
       .attr("y2", height)
-      .attr("stroke", "rgba(200,0,0,0.35)")
-      .attr("stroke-width", 1)
+      .attr("stroke", "rgba(255,0,0,0.5)")
+      .attr("stroke-width", 0.5)
       .attr("stroke-dasharray", "6,4");
     g.append("line")
       .attr("x1", 0)
       .attr("x2", width)
       .attr("y1", yScale(0))
       .attr("y2", yScale(0))
-      .attr("stroke", "rgba(200,0,0,0.35)")
-      .attr("stroke-width", 1)
+      .attr("stroke", "rgba(255,0,0,0.5)")
+      .attr("stroke-width", 0.5)
       .attr("stroke-dasharray", "6,4");
 
-    // Axes
+    // Axes (explicit ticks matching R)
     g.append("g")
       .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(xScale).ticks(7))
+      .call(d3.axisBottom(xScale).tickValues([-150, -100, -50, 0, 50, 100, 150]).tickFormat(d3.format("d")))
       .selectAll("text")
       .attr("fill", "#6b7280")
       .attr("font-size", "20px");
     g.append("g")
-      .call(d3.axisLeft(yScale).ticks(5))
+      .call(d3.axisLeft(yScale).tickValues([-40, -20, 0, 20, 40]).tickFormat(d => d.toFixed(1)))
       .selectAll("text")
       .attr("fill", "#6b7280")
       .attr("font-size", "20px");
@@ -569,13 +581,13 @@
     g.append("path")
       .datum(data)
       .attr("d", area)
-      .attr("fill", COLOR_STEEL)
+      .attr("fill", "steelblue")
       .attr("opacity", 0)
       .transition()
       .duration(600)
-      .attr("opacity", 0.2);
+      .attr("opacity", 0.25);
 
-    // Smooth line
+    // Smooth line (linewidth=1.5 matching R)
     const line = d3
       .line()
       .x((d) => xScale(d.x))
@@ -586,8 +598,8 @@
       .append("path")
       .datum(data)
       .attr("fill", "none")
-      .attr("stroke", COLOR_STEEL)
-      .attr("stroke-width", 2.5)
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 1.5)
       .attr("d", line);
     const totalLength = linePath.node().getTotalLength();
     linePath
@@ -609,64 +621,62 @@
     const trG = g.append("g").attr("opacity", 0);
     trG
       .append("rect")
-      .attr("x", xScale(55))
-      .attr("y", yScale(42))
-      .attr("width", 300)
-      .attr("height", 52)
-      .attr("rx", 6)
-      .attr("fill", "#fff")
-      .attr("stroke", COLOR_GAIN)
-      .attr("stroke-width", 1)
-      .attr("stroke-opacity", 0.4);
+      .attr("x", xScale(60))
+      .attr("y", yScale(43))
+      .attr("width", 280)
+      .attr("height", 48)
+      .attr("rx", 3)
+      .attr("fill", "white")
+      .attr("stroke", "#333")
+      .attr("stroke-width", 0.5);
     trG
       .append("text")
-      .attr("x", xScale(55) + 14)
-      .attr("y", yScale(42) + 22)
-      .attr("fill", COLOR_GAIN)
-      .attr("font-size", "17px")
-      .attr("font-weight", "600")
+      .attr("x", xScale(60) + 12)
+      .attr("y", yScale(43) + 20)
+      .attr("fill", "#282c34")
+      .attr("font-size", "16px")
+      .attr("font-weight", "500")
       .attr("font-family", FONT)
-      .text("High electricity prices");
+      .text("High Electricity Prices /");
     trG
       .append("text")
-      .attr("x", xScale(55) + 14)
-      .attr("y", yScale(42) + 42)
-      .attr("fill", COLOR_GAIN)
-      .attr("font-size", "15px")
+      .attr("x", xScale(60) + 12)
+      .attr("y", yScale(43) + 38)
+      .attr("fill", "#282c34")
+      .attr("font-size", "16px")
       .attr("font-family", FONT)
-      .text("→ Increase in freshwater availability");
+      .text("Increase in freshwater availability");
     trG.transition().duration(600).delay(annoDelay).attr("opacity", 1);
 
     // Bottom-left: low prices → less water
     const blG = g.append("g").attr("opacity", 0);
     blG
       .append("rect")
-      .attr("x", xScale(-145))
-      .attr("y", yScale(-28))
-      .attr("width", 300)
-      .attr("height", 52)
-      .attr("rx", 6)
-      .attr("fill", "#fff")
-      .attr("stroke", COLOR_LOSS)
-      .attr("stroke-width", 1)
-      .attr("stroke-opacity", 0.4);
+      .attr("x", xScale(-140))
+      .attr("y", yScale(-32))
+      .attr("width", 280)
+      .attr("height", 48)
+      .attr("rx", 3)
+      .attr("fill", "white")
+      .attr("stroke", "#333")
+      .attr("stroke-width", 0.5);
     blG
       .append("text")
-      .attr("x", xScale(-145) + 14)
-      .attr("y", yScale(-28) + 22)
-      .attr("fill", COLOR_LOSS)
-      .attr("font-size", "17px")
-      .attr("font-weight", "600")
+      .attr("x", xScale(-140) + 12)
+      .attr("y", yScale(-32) + 20)
+      .attr("fill", "#282c34")
+      .attr("font-size", "16px")
+      .attr("font-weight", "500")
       .attr("font-family", FONT)
-      .text("Low electricity prices");
+      .text("Low Electricity Prices /");
     blG
       .append("text")
-      .attr("x", xScale(-145) + 14)
-      .attr("y", yScale(-28) + 42)
-      .attr("fill", COLOR_LOSS)
-      .attr("font-size", "15px")
+      .attr("x", xScale(-140) + 12)
+      .attr("y", yScale(-32) + 38)
+      .attr("fill", "#282c34")
+      .attr("font-size", "16px")
       .attr("font-family", FONT)
-      .text("→ Decrease in freshwater availability");
+      .text("Decrease in freshwater availability");
     blG.transition().duration(600).delay(annoDelay + 200).attr("opacity", 1);
 
   }

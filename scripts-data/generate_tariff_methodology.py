@@ -7,7 +7,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.lib.colors import HexColor
 from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable, PageBreak
 )
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 import os
@@ -82,7 +82,7 @@ def build_pdf():
     # TITLE
     # ══════════════════════════════════════════════════════════
     elements.append(Paragraph(
-        "Tariff & NRW Charts: Data Sources & Methodology", title_style))
+        "Tariff, NRW & Affordability Charts: Data Sources & Methodology", title_style))
     elements.append(HRFlowable(
         width="100%", thickness=1.5, color=MAROON, spaceAfter=3))
 
@@ -93,9 +93,9 @@ def build_pdf():
 
     elements.append(Paragraph(
         "<b>Data sources.</b> Two independent sources merged: "
-        "<b>(A)</b> IBNET Excel Export (23,592 records, 2,920 utilities, 222 countries, 1992\u20132025) \u2014 "
+        "<b>(A)</b> IBNET Excel Export (23,592 records, 2,920 utilities, 222 countries, 1992\u20132025)  - "
         "official IBNET database with tariff structures and calculated costs for standardized consumption. "
-        "<b>(B)</b> Web-scraped data (ibnet_automate) \u2014 automated scraping via per-utility URLs (Tier 1) "
+        "<b>(B)</b> Web-scraped data (ibnet_automate)  - automated scraping via per-utility URLs (Tier 1) "
         "and 34 national regulator handlers (Tier 2), adding 2,011 new utilities across 45+ countries (April 2026). "
         "Merged dataset: <b>11,174 utilities across 223 countries</b>.",
         small))
@@ -130,7 +130,7 @@ def build_pdf():
     # ══════════════════════════════════════════════════════════
     elements.append(Paragraph("2. Tariff Comparison with GWI Data", section_style))
     elements.append(Paragraph(
-        "GWI does not include NRW data. Comparison applies to tariffs only.",
+        "",
         small))
 
     t2 = Table([
@@ -151,7 +151,7 @@ def build_pdf():
 
     elements.append(Paragraph(
         "<b>Key differences:</b> "
-        "In constant USD (no PPP), IBNET ($1.00/m\u00b3) and GWI ($0.75/m\u00b3) are in the same range\u2014"
+        "In constant USD (no PPP), IBNET ($1.00/m\u00b3) and GWI ($0.75/m\u00b3) are in the same range -"
         "the gap reflects different utility samples and aggregation methods. "
         "PPP-adjusted IBNET median ($2.54/m\u00b3) is higher because PPP inflates tariffs "
         "in low/middle-income countries where purchasing power is lower.",
@@ -165,11 +165,11 @@ def build_pdf():
     elements.append(Paragraph(
         "<b>Data sources.</b> Three sources combined with priority deduplication "
         "(Regulators > NewIBNET > Old IBNET): "
-        "<b>(A)</b> Regulators Performance Database \u2014 70,006 NRW observations from 19 countries "
+        "<b>(A)</b> Regulators Performance Database  - 70,006 NRW observations from 19 countries "
         "(primarily SSA and LAC), utility-level data from national regulators. "
-        "<b>(B)</b> NewIBNET.xlsx \u2014 387 observations (after dedup), 65 countries, 2021\u20132023. "
+        "<b>(B)</b> NewIBNET.xlsx  - 387 observations (after dedup), 65 countries, 2021\u20132023. "
         "Extends ECA, MENAAP, and SAR coverage into recent years. "
-        "<b>(C)</b> Old IBNET Export \u2014 24,092 observations, ~144 countries (after comma-separated "
+        "<b>(C)</b> Old IBNET Export  - 24,092 observations, ~144 countries (after comma-separated "
         "number parsing fix that recovered 29,475 rows). "
         "Combined: <b>94,485 NRW observations, 151 countries</b>.",
         small))
@@ -200,9 +200,92 @@ def build_pdf():
         "(country median \u2192 regional median) + 3-year rolling median smoothing. "
         "Minimum 2 countries per region-year; Global requires \u22653 countries. "
         "<b>Note:</b> The Global median is the median of all individual country medians pooled across "
-        "all regions\u2014not the average of regional medians. Because many countries across SSA, EAP, "
+        "all regions -not the average of regional medians. Because many countries across SSA, EAP, "
         "and ECA have NRW above 35\u201350%, the Global median can exceed some individual regional medians "
         "(e.g., LAC or SAR) where fewer, lower-NRW countries dominate.",
+        small))
+
+    # ══════════════════════════════════════════════════════════
+    # PAGE 2: AFFORDABILITY CHART
+    # ══════════════════════════════════════════════════════════
+    elements.append(PageBreak())
+
+    elements.append(Paragraph(
+        "4. Affordability Chart", section_style))
+
+    elements.append(Paragraph(
+        "<b>What it shows.</b> Median water bill (15 m\u00b3/month) as a percentage of income, "
+        "comparing the national average (% of GDP per capita) with the bottom 20% income group, "
+        "aggregated by World Bank income classification.",
+        small))
+
+    # Data sources
+    elements.append(Paragraph(
+        "<b>Data sources.</b> "
+        "<b>(A)</b> IBNET Tariff Portal (countries.json) - provides affordGdp (bill as % of GDP pc) "
+        "and affordB20 (bill as % of income for bottom 20% households) for 142 countries. "
+        "Tariffs based on a standardized 15 m\u00b3/month consumption. "
+        "<b>(B)</b> World Bank income classification (FY2026) - fetched from WB API, "
+        "classifying 215 economies into four groups: Low income (25), Lower middle income (50), "
+        "Upper middle income (54), High income (86).",
+        small))
+
+    # Methodology
+    elements.append(Paragraph("<b>Methodology:</b>", small))
+    elements.append(Paragraph(
+        "1. Match each IBNET country (ISO3) to its WB income group. "
+        "142 of 223 IBNET countries have both affordGdp and affordB20 data.",
+        small))
+    elements.append(Paragraph(
+        "2. For each income group, compute the <b>median</b> of affordGdp and affordB20 "
+        "across all matched countries. Median is preferred over mean to reduce the influence "
+        "of extreme values (e.g., Mozambique at 113% B20).",
+        small))
+    elements.append(Paragraph(
+        "3. Display as paired horizontal bars with the WHO 3% affordability threshold as reference.",
+        small))
+
+    # Results table
+    elements.append(Paragraph("<b>Results:</b>", small))
+    t4 = Table([
+        ["Income group", "Countries", "Nat. avg (% GDP pc)", "Bottom 20% (% income)"],
+        ["Low income", "15", "2.86%", "33.93%"],
+        ["Lower middle income", "43", "1.25%", "12.58%"],
+        ["Upper middle income", "40", "0.40%", "4.07%"],
+        ["High income", "43", "0.56%", "3.65%"],
+    ], colWidths=[40*mm, 20*mm, 36*mm, 40*mm])
+    t4.setStyle(TableStyle(TABLE_STYLE_NAVY))
+    elements.append(t4)
+    elements.append(Spacer(1, 3))
+
+    # Key metrics
+    elements.append(Paragraph(
+        "<b>affordGdp</b> = (monthly bill for 15 m\u00b3 / GDP per capita per month) \u00d7 100. "
+        "Reflects the average household's ability to pay relative to national economic output. "
+        "GDP per capita (PPP) sourced from World Bank indicator PA.NUS.PPP.",
+        small))
+    elements.append(Paragraph(
+        "<b>affordB20</b> = (monthly bill for 15 m\u00b3 / estimated monthly consumption of bottom 20%) \u00d7 100. "
+        "The bottom quintile's mean consumption "
+        "is estimated from national household consumption per capita (World Bank NE.CON.PRVT.PC.CD) "
+        "adjusted using the Gini coefficient (World Bank SI.POV.GINI): "
+        "B20 consumption = HH consumption \u00d7 (1 - Gini)<super>1.5</super>. "
+        "Available for 142 countries where both Gini and household consumption data exist.",
+        small))
+
+    # Key insight
+    elements.append(Paragraph(
+        "<b>Results.</b> "
+        "In low-income countries, water bills consume a median of 34% of the poorest households' income, "
+        "more than 11x the WHO affordability threshold of 3%. Even in lower-middle-income countries, "
+        "the bottom 20% face bills at 4x the threshold. At the national average level, tariffs appear "
+        "affordable across all income groups, masking severe distributional burden on the poor.",
+        small))
+
+    # Source note
+    elements.append(Paragraph(
+        "<b>Sources.</b> IBNET Tariff Portal (World Bank); World Bank income classification "
+        "(https://datahelpdesk.worldbank.org/knowledgebase/articles/906519).",
         small))
 
     # ── Footer ──

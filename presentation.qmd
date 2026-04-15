@@ -88,7 +88,7 @@ format:
 </div>
 
 <div style="font-size:0.6em; color:#6b7280; font-style:italic; margin-top:0.3em;">
-  Source: GRACE/GRACE-FO satellite data; Continental Drying — A Threat to Our Common Future, World Bank
+  Source: GRACE/GRACE-FO satellite data; Continental Drying - A Threat to Our Common Future, World Bank
 </div>
 ```
 
@@ -350,7 +350,7 @@ Source: Regulators Performance Database, IBNET
 ## {#affordability data-background-color="#ffffff"}
 
 ```{=html}
-<div id="hero-chart-affordability" class="hero-chart-container chart-full"></div>
+<div id="hero-chart-affordability" class="hero-chart-container" style="width:100%; height:900px;"></div>
 ```
 
 ::: {.source}
@@ -390,9 +390,9 @@ Source: IBNET Tariff Portal, World Bank
 
   </div>
 
-  <!-- Right: energy pricing chart -->
-  <div style="flex:1; position:relative;">
-    <div id="chart-energy-pricing" class="chart-container" style="height:720px; overflow:visible;"></div>
+  <!-- Right: energy pricing chart (R-generated, transparent bg) -->
+  <div style="flex:1; display:flex; align-items:center; justify-content:center;">
+    <img src="images/elec_tws_chart.png" alt="Impact of energy pricing on terrestrial water storage" style="max-height:720px; width:auto; max-width:100%;" />
   </div>
 
 </div>
