@@ -356,31 +356,15 @@
      SCENE 5: SPENDING GAP
      ═══════════════════════════════════════════════════════════ -->
 </section>
-<section id="spending-gap" class="slide level2 iframe-slide" data-background-color="#f8f5f0" data-background-iframe="https://spending-gaps-standalone.replit.app/" data-background-interactive="true">
+<section id="spending-gap" class="slide level2" data-background-color="#f8f5f0" data-background-iframe="https://spending-gaps-standalone.replit.app/" data-background-interactive="true">
 <h2></h2>
 </section>
-<section id="budget-execution" class="slide level2 iframe-slide" data-background-color="#f8f5f0" data-background-iframe="https://budget-execution-standalone.replit.app/" data-background-interactive="true">
+<section id="budget-execution" class="slide level2" data-background-color="#f8f5f0">
 <h2></h2>
-<script>
-// Inject cover elements over iframe top borders
-(function() {
-  function addCovers() {
-    document.querySelectorAll('.slide-background-content').forEach(function(el) {
-      if (el.querySelector('iframe') && !el.querySelector('.iframe-border-cover')) {
-        var cover = document.createElement('div');
-        cover.className = 'iframe-border-cover';
-        el.appendChild(cover);
-      }
-    });
-  }
-  if (typeof Reveal !== 'undefined') {
-    if (Reveal.isReady && Reveal.isReady()) { setTimeout(addCovers, 1000); }
-    else { Reveal.on('ready', function() { setTimeout(addCovers, 1000); }); }
-  } else {
-    document.addEventListener('DOMContentLoaded', function() { setTimeout(addCovers, 2000); });
-  }
-})();
-</script>
+<div id="chart-budget-execution" style="width:100%; height:900px;"></div>
+<div class="source">
+<p>Source: World Bank portfolio data</p>
+</div>
 </section>
 <section id="tariffs" class="slide level2" data-background-color="#ffffff">
 <h2></h2>
@@ -428,8 +412,8 @@
 
     <!-- Big stat: 70% -->
     <div style="background:#f0e8e4; border-radius:12px; padding:24px 30px; margin-bottom:1.2em; border-left:5px solid #8b1a2d;">
-      <div style="font-family:'Playfair Display', Georgia, serif; font-size:2.8em; font-weight:900; color:#8b1a2d; line-height:1;">70%</div>
-      <div style="font-family:'Nunito', sans-serif; font-size:0.95em; color:#4a5568; margin-top:0.3em;">of freshwater diverted by human activity goes to irrigation</div>
+      <div style="font-family:'Playfair Display', Georgia, serif; font-size:2.8em; font-weight:900; color:#8b1a2d; line-height:1;">98%</div>
+      <div style="font-family:'Nunito', sans-serif; font-size:0.95em; color:#4a5568; margin-top:0.3em;">Agriculture is the largest water consumer, accounting for 98 percent of the global water footprint</div>
     </div>
 
     <!-- Stat: 26/80 -->
@@ -533,6 +517,7 @@
 <script src="scripts/coverage-map.js"></script>
 <script src="scripts/cd-chart.js?v=4"></script>
 <script src="scripts/cd-map.js?v=2"></script>
+<script src="scripts/spending-chart.js?v=3"></script>
 <script src="scripts/tb-chart.js?v=5"></script>
 <script>
 // Robust chart dispatch — runs after all scripts load
