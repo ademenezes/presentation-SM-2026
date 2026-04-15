@@ -314,11 +314,11 @@ Source: World Bank Triple Burden Analysis (2025)
 
 
 
-## {#tariffs-nominal data-background-color="#ffffff"}
+## {#tariffs data-background-color="#ffffff"}
 
 ```{=html}
-<div id="hero-chart-tariffs-nominal" class="hero-chart-container chart-full"></div>
-<div class="fragment world-line-trigger" data-fragment-index="0" data-chart="hero-chart-tariffs-nominal"></div>
+<div id="hero-chart-tariffs" class="hero-chart-container chart-full"></div>
+<div class="fragment world-line-trigger" data-fragment-index="0" data-chart="hero-chart-tariffs"></div>
 ```
 
 ::: {.source}

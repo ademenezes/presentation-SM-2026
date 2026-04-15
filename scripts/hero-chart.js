@@ -222,9 +222,14 @@
   }
 
   function renderTariffs() {
-    renderTariffChart("hero-chart-tariffs", datasets.tariffs, {
-      yMax: 55,
-      yLabel: "PPP USD / 15 m\u00b3",
+    // Convert from $/15m³ to $/m³
+    const transformed = {};
+    for (const [key, arr] of Object.entries(datasets.tariffs)) {
+      transformed[key] = arr.map(d => ({ ...d, median15m3: d.median15m3 / 15 }));
+    }
+    renderTariffChart("hero-chart-tariffs", transformed, {
+      yMax: 4,
+      yLabel: "PPP USD / m\u00b3",
       title: "Water Is More Expensive Than It Looks",
       notes: "Median tariffs by region, PPP-adjusted (World Bank) \u00b7 3-year rolling median \u00b7 2016\u20132024",
     });
