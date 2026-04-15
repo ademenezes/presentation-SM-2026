@@ -54,7 +54,7 @@
     const [tariffs, tariffsNominal, nrw, metering, costCov, coverageMap] = await Promise.all([
       fetch("data/timeseries.json?v=2").then((r) => r.json()),
       fetch("data/timeseries_nominal.json?v=1").then((r) => r.json()),
-      fetch("data/nrw_trends.json").then((r) => r.json()),
+      fetch("data/nrw_trends.json?v=3").then((r) => r.json()),
       fetch("data/metering_trends.json").then((r) => r.json()),
       fetch("data/cost_coverage_trends.json").then((r) => r.json()),
       fetch("data/coverage_map.json").then((r) => r.json()),
@@ -94,16 +94,17 @@
     const lineData = regions.map(region => ({
       region, color: REGION_COLORS[region] || "#888", short: REGION_SHORT[region],
       values: (data[region] || []).map(d => ({ year: d.year, value: d.median15m3 }))
-        .filter(d => d.value != null && !isNaN(d.value) && d.year >= 2016 && d.year <= 2024),
+        .filter(d => d.value != null && !isNaN(d.value) && d.year >= (opts.yearMin || 2016) && d.year <= (opts.yearMax || 2024)),
     })).filter(d => d.values.length >= 2);
 
     const globalData = (data["Global"] || []).map(d => ({ year: d.year, value: d.median15m3 }))
-      .filter(d => d.value != null && !isNaN(d.value) && d.year >= 2016 && d.year <= 2024);
+      .filter(d => d.value != null && !isNaN(d.value) && d.year >= (opts.yearMin || 2016) && d.year <= (opts.yearMax || 2024));
 
     let allYears = [];
     lineData.forEach(d => d.values.forEach(v => allYears.push(v.year)));
     if (globalData.length) globalData.forEach(v => allYears.push(v.year));
-    const xScale = d3.scaleLinear().domain([2016, 2024]).range([0, width]);
+    const xMin = opts.yearMin || 2016, xMax = opts.yearMax || 2024;
+    const xScale = d3.scaleLinear().domain([xMin, xMax]).range([0, width]);
     const yScale = d3.scaleLinear().domain([0, opts.yMax]).range([height, 0]);
 
     // Grid
@@ -141,45 +142,21 @@
       "Europe and Central Asia", "Latin America and the Caribbean", "Sub-Saharan Africa", "East Asia and Pacific"];
     lineData.sort((a, b) => sortOrder.indexOf(a.region) - sortOrder.indexOf(b.region));
 
-    // Track regional paths for fading
-    const regionPaths = [];
-
-    lineData.forEach((series, i) => {
-      const path = g.append("path").datum(series.values)
-        .attr("fill", "none").attr("stroke", series.color)
-        .attr("stroke-width", 4).attr("stroke-linecap", "round").attr("d", line);
-      regionPaths.push(path);
-      const totalLength = path.node().getTotalLength();
-      path.attr("stroke-dasharray", totalLength).attr("stroke-dashoffset", totalLength)
-        .transition().duration(ANIM).delay(i * 200).ease(d3.easeCubicOut)
+    // ── World Average draws first (visible on slide entry) ──
+    let gPath, wLabelG, gLen;
+    if (globalData.length >= 2) {
+      const globalLine = d3.line().x(d => xScale(d.year)).y(d => yScale(d.value)).curve(d3.curveMonotoneX);
+      gPath = g.append("path").datum(globalData)
+        .attr("fill", "none").attr("stroke", "#1a3a5c")
+        .attr("stroke-width", 6).attr("stroke-linecap", "round").attr("d", globalLine);
+      gLen = gPath.node().getTotalLength();
+      gPath.attr("stroke-dasharray", gLen).attr("stroke-dashoffset", gLen)
+        .transition().duration(ANIM).ease(d3.easeCubicOut)
         .attr("stroke-dashoffset", 0)
         .on("end", function () { d3.select(this).attr("stroke-dasharray", "none"); });
 
-      const last = series.values[series.values.length - 1];
-      const labelG = g.append("g").attr("class", "region-label").attr("opacity", 0);
-      labelG.append("circle").attr("cx", xScale(last.year)).attr("cy", yScale(last.value))
-        .attr("r", 7).attr("fill", series.color).attr("stroke", "#fff").attr("stroke-width", 2);
-      labelG.append("text").attr("x", xScale(last.year) + 16).attr("y", yScale(last.value) - 2)
-        .attr("fill", series.color).attr("font-size", "18px").attr("font-weight", "700")
-        .attr("font-family", "'Nunito', -apple-system, sans-serif").text(series.short);
-      labelG.append("text").attr("x", xScale(last.year) + 16).attr("y", yScale(last.value) + 18)
-        .attr("fill", series.color).attr("font-size", "16px").attr("font-weight", "500")
-        .attr("font-family", "'Nunito', -apple-system, sans-serif").text("$" + last.value.toFixed(0));
-      labelG.transition().duration(500).delay(ANIM + i * 200).attr("opacity", 1);
-    });
-
-    // Store World line elements (hidden until fragment triggers)
-    if (globalData.length >= 2) {
-      const globalLine = d3.line().x(d => xScale(d.year)).y(d => yScale(d.value)).curve(d3.curveMonotoneX);
-      const gPath = g.append("path").datum(globalData)
-        .attr("fill", "none").attr("stroke", "#1a3a5c")
-        .attr("stroke-width", 6).attr("stroke-linecap", "round").attr("d", globalLine)
-        .attr("opacity", 0);
-      const gLen = gPath.node().getTotalLength();
-      gPath.attr("stroke-dasharray", gLen).attr("stroke-dashoffset", gLen);
-
       const gLast = globalData[globalData.length - 1];
-      const wLabelG = g.append("g").attr("opacity", 0);
+      wLabelG = g.append("g").attr("opacity", 0);
       wLabelG.append("circle").attr("cx", xScale(gLast.year)).attr("cy", yScale(gLast.value))
         .attr("r", 9).attr("fill", "#1a3a5c").attr("stroke", "#fff").attr("stroke-width", 3);
       wLabelG.append("text").attr("x", xScale(gLast.year) + 18).attr("y", yScale(gLast.value) - 6)
@@ -187,38 +164,98 @@
         .attr("font-family", "'Playfair Display', Georgia, serif").text("World Average");
       wLabelG.append("text").attr("x", xScale(gLast.year) + 18).attr("y", yScale(gLast.value) + 20)
         .attr("fill", "#1a3a5c").attr("font-size", "20px").attr("font-weight", "600")
-        .attr("font-family", "'Nunito', -apple-system, sans-serif").text("$" + gLast.value.toFixed(0));
-
-      // Store reveal function on the container for fragment triggering
-      container._showWorldLine = function () {
-        // Fade regional lines
-        regionPaths.forEach(function (p) {
-          p.transition().duration(800).attr("stroke-opacity", 0.3);
-        });
-        g.selectAll(".region-label").each(function () {
-          d3.select(this).transition().duration(800).attr("opacity", 0.35);
-        });
-        // Draw World line
-        gPath.transition().delay(600).duration(ANIM)
-          .attr("opacity", 1).attr("stroke-dashoffset", 0)
-          .ease(d3.easeCubicOut)
-          .on("end", function () { d3.select(this).attr("stroke-dasharray", "none"); });
-        wLabelG.transition().delay(600 + ANIM).duration(500).attr("opacity", 1);
-      };
-      container._hideWorldLine = function () {
-        // Restore regional lines
-        regionPaths.forEach(function (p) {
-          p.transition().duration(600).attr("stroke-opacity", 1);
-        });
-        g.selectAll(".region-label").each(function () {
-          d3.select(this).transition().duration(600).attr("opacity", 1);
-        });
-        // Hide World line
-        gPath.transition().duration(400).attr("opacity", 0)
-          .on("end", function () { d3.select(this).attr("stroke-dashoffset", gLen); });
-        wLabelG.transition().duration(400).attr("opacity", 0);
-      };
+        .attr("font-family", "'Nunito', -apple-system, sans-serif")
+        .text((opts.valuePrefix || "$") + gLast.value.toFixed(opts.valueDecimals != null ? opts.valueDecimals : 2) + (opts.valueSuffix || ""));
+      wLabelG.transition().duration(500).delay(ANIM).attr("opacity", 1);
     }
+
+    // ── Regional lines (hidden, revealed on fragment click) ──
+    const regionPaths = [];
+
+    // Collect label positions for collision avoidance (include World Average as fixed anchor)
+    const labelPositions = lineData.map(series => {
+      const last = series.values[series.values.length - 1];
+      return { rawY: yScale(last.value), series: series, last: last, fixed: false };
+    });
+    // Add World Average position as a fixed point that won't move
+    if (globalData.length >= 2) {
+      const gLast = globalData[globalData.length - 1];
+      labelPositions.push({ rawY: yScale(gLast.value), series: null, fixed: true });
+    }
+    // Sort by y position (top to bottom)
+    labelPositions.sort((a, b) => a.rawY - b.rawY);
+    // Push apart overlapping labels (minimum 48px spacing)
+    const MIN_GAP = 48;
+    for (let pass = 0; pass < 8; pass++) {
+      for (let i = 1; i < labelPositions.length; i++) {
+        var diff = labelPositions[i].rawY - labelPositions[i - 1].rawY;
+        if (diff < MIN_GAP) {
+          var shift = (MIN_GAP - diff) / 2;
+          // Don't move fixed (World Average) entries
+          if (!labelPositions[i - 1].fixed && !labelPositions[i].fixed) {
+            labelPositions[i - 1].rawY -= shift;
+            labelPositions[i].rawY += shift;
+          } else if (labelPositions[i - 1].fixed) {
+            labelPositions[i].rawY += MIN_GAP - diff;
+          } else {
+            labelPositions[i - 1].rawY -= MIN_GAP - diff;
+          }
+        }
+      }
+    }
+
+    lineData.forEach((series, i) => {
+      const path = g.append("path").datum(series.values)
+        .attr("fill", "none").attr("stroke", series.color)
+        .attr("stroke-width", 4).attr("stroke-linecap", "round").attr("d", line)
+        .attr("opacity", 0);
+      regionPaths.push(path);
+      const totalLength = path.node().getTotalLength();
+      path.attr("stroke-dasharray", totalLength).attr("stroke-dashoffset", totalLength);
+
+      const last = series.values[series.values.length - 1];
+      const lp = labelPositions.find(p => p.series === series);
+      const labelY = lp ? lp.rawY : yScale(last.value);
+      const labelG = g.append("g").attr("class", "region-label").attr("opacity", 0);
+      labelG.append("circle").attr("cx", xScale(last.year)).attr("cy", yScale(last.value))
+        .attr("r", 7).attr("fill", series.color).attr("stroke", "#fff").attr("stroke-width", 2);
+      labelG.append("text").attr("x", xScale(last.year) + 16).attr("y", labelY - 2)
+        .attr("fill", series.color).attr("font-size", "22px").attr("font-weight", "700")
+        .attr("font-family", "'Nunito', -apple-system, sans-serif").text(series.short);
+      labelG.append("text").attr("x", xScale(last.year) + 16).attr("y", labelY + 22)
+        .attr("fill", series.color).attr("font-size", "19px").attr("font-weight", "500")
+        .attr("font-family", "'Nunito', -apple-system, sans-serif")
+        .text((opts.valuePrefix || "$") + last.value.toFixed(opts.valueDecimals != null ? opts.valueDecimals : 2) + (opts.valueSuffix || ""));
+    });
+
+    // Fragment trigger: show regional lines, dim World
+    container._showWorldLine = function () {
+      // Dim World line
+      if (gPath) gPath.transition().duration(800).attr("stroke-opacity", 0.3);
+      if (wLabelG) wLabelG.transition().duration(800).attr("opacity", 0.35);
+      // Draw regional lines
+      regionPaths.forEach(function (p, i) {
+        var len = p.node().getTotalLength();
+        p.transition().delay(i * 200).duration(ANIM).ease(d3.easeCubicOut)
+          .attr("opacity", 1).attr("stroke-dashoffset", 0)
+          .on("end", function () { d3.select(this).attr("stroke-dasharray", "none"); });
+      });
+      g.selectAll(".region-label").each(function (d, i) {
+        d3.select(this).transition().duration(500).delay(ANIM + i * 200).attr("opacity", 1);
+      });
+    };
+    container._hideWorldLine = function () {
+      // Restore World line
+      if (gPath) gPath.transition().duration(600).attr("stroke-opacity", 1);
+      if (wLabelG) wLabelG.transition().duration(600).attr("opacity", 1);
+      // Hide regional lines
+      regionPaths.forEach(function (p) {
+        p.transition().duration(400).attr("opacity", 0);
+      });
+      g.selectAll(".region-label").each(function () {
+        d3.select(this).transition().duration(400).attr("opacity", 0);
+      });
+    };
   }
 
   function renderTariffs() {
@@ -230,7 +267,7 @@
     renderTariffChart("hero-chart-tariffs", transformed, {
       yMax: 4,
       yLabel: "PPP USD / m\u00b3",
-      title: "Water Is More Expensive Than It Looks",
+      title: "Water Remains an Underpriced Service",
       notes: "Median tariffs by region, PPP-adjusted (World Bank) \u00b7 3-year rolling median \u00b7 2016\u20132024",
     });
   }
@@ -244,8 +281,27 @@
     });
   }
 
+  function renderNRWTrend() {
+    // Transform NRW data: field "median" → "median15m3" for renderTariffChart compatibility
+    const transformed = {};
+    for (const [key, arr] of Object.entries(datasets.nrw)) {
+      transformed[key] = arr.map(d => ({ ...d, median15m3: d.median }));
+    }
+    renderTariffChart("hero-chart-nrw", transformed, {
+      yMax: 55,
+      yLabel: "Non-Revenue Water (%)",
+      title: "Utilities Lose a Third of Their Water Before It Reaches Customers",
+      notes: "Median NRW by region \u00b7 median-of-medians \u00b7 3-year rolling median \u00b7 Global = median across all country medians, not average of regions",
+      yearMin: 2016,
+      yearMax: 2024,
+      valuePrefix: "",
+      valueSuffix: "%",
+      valueDecimals: 1,
+    });
+  }
+
   // ═══════════════════════════════════════════════════════════
-  // NRW — Animated bubble chart (Tariff vs NRW, sized by utilities)
+  // NRW — Animated bubble chart (Tariff vs NRW, sized by utilities) [LEGACY]
   // ═══════════════════════════════════════════════════════════
   function renderNRWBubble() {
     const container = document.getElementById("hero-chart-nrw");
@@ -893,7 +949,7 @@
   const RENDERERS = {
     tariffs: renderTariffs,
     "tariffs-nominal": renderTariffsNominal,
-    nrw: renderNRWBubble,
+    nrw: renderNRWTrend,
     metering: renderMetering,
     "cost-coverage": renderCostCoverage,
     paradox: renderParadox,

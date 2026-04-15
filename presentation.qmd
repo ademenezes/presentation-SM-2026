@@ -334,6 +334,7 @@ Source: IBNET Tariff Portal, constant 2025 USD
 
 ```{=html}
 <div id="hero-chart-nrw" class="hero-chart-container chart-full"></div>
+<div class="fragment world-line-trigger" data-fragment-index="0" data-chart="hero-chart-nrw"></div>
 ```
 
 ::: {.source}
@@ -493,7 +494,7 @@ Source: WSIP 2025; World Bank Water Tariff Roadmap 2026
      ═══════════════════════════════════════════════════════════ -->
 
 <script src="scripts/main.js?v=6"></script>
-<script src="scripts/hero-chart.js?v=6"></script>
+<script src="scripts/hero-chart.js?v=7"></script>
 <script src="scripts/coverage-map.js"></script>
 <script src="scripts/cd-chart.js?v=4"></script>
 <script src="scripts/cd-map.js?v=2"></script>

@@ -102,9 +102,10 @@ def load_ibnet_backup():
             "R_53_POP_CONNECTIONS_OPERATING_METER", "R_41_POP_CONNECTIONS_YEAR_END",
             "R_90_TOTAL_OPERATING_REVENUE", "R_94_TOTAL_OPERATING_EXPENSES"]
     df = pd.read_csv(path, encoding="latin-1", usecols=cols)
-    # Convert numeric columns (may be read as strings due to encoding issues)
+    # Convert numeric columns — strip commas first (old IBNET has "57,237,112.48" format)
     for c in cols:
         if c not in ("Country", "Year"):
+            df[c] = df[c].astype(str).str.replace(",", "", regex=False)
             df[c] = pd.to_numeric(df[c], errors="coerce")
     df["country_iso3"] = df["Country"].map(COUNTRY_NAME_TO_ISO3)
     df["year"] = pd.to_numeric(df["Year"], errors="coerce")
@@ -139,13 +140,55 @@ def load_ibnet_backup():
     return result
 
 
-def compute_regional_trends(df, indicator_id, country_region_map, min_countries=2, min_year=2005):
+def load_new_ibnet():
+    """Load NewIBNET.xlsx (2021-2023 data) and compute NRW."""
+    path = IBNET_GWI / "NewIBNET.xlsx"
+    print("Loading NewIBNET...")
+    import openpyxl
+    wb = openpyxl.load_workbook(path, read_only=True)
+    ws = wb["Sheet1"]
+    header = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
+    data_rows = list(ws.iter_rows(min_row=2, values_only=True))
+    wb.close()
+
+    rows = []
+    for r in data_rows:
+        iso3 = r[0]
+        try:
+            year = int(float(r[4])) if r[4] else None
+            prod = float(r[10]) if r[10] else None
+            billed = float(r[12]) if r[12] else None
+        except (ValueError, TypeError):
+            continue
+        if not (iso3 and year and prod and prod > 0 and billed is not None):
+            continue
+        nrw = (prod - billed) / prod * 100
+        if 5 <= nrw <= 100:
+            rows.append({"country_iso3": iso3, "year": year, "value": nrw, "indicator_id": "OPS_NRW_PCT"})
+
+    result = pd.DataFrame(rows)
+    result["source"] = "new_ibnet"
+    print(f"  {len(result):,} NRW observations, {result['country_iso3'].nunique()} countries")
+    return result
+
+
+    # Normalize region names: WB API uses "&" but chart JS uses "and"
+REGION_NAME_NORMALIZE = {
+    "East Asia & Pacific": "East Asia and Pacific",
+    "Europe & Central Asia": "Europe and Central Asia",
+    "Latin America & Caribbean": "Latin America and the Caribbean",
+    "Middle East, North Africa, Afghanistan & Pakistan": "Middle East, North Africa, Afghanistan and Pakistan",
+}
+
+
+def compute_regional_trends(df, indicator_id, country_region_map, min_countries=2, min_year=2005, rolling_window=0):
     """
     Compute median-of-medians by region and year.
     min_year=2005: earlier years have sparse, inconsistent data across regions.
     min_countries=2: require at least 2 countries per region-year for a stable median.
     Global trend requires min 3 countries (hardcoded below).
     Country median first, then regional median (prevents large-country domination).
+    rolling_window: if >0, apply N-year rolling median smoothing to reduce composition effects.
     """
     ind = df[df["indicator_id"] == indicator_id].copy()
     if len(ind) == 0:
@@ -182,9 +225,12 @@ def compute_regional_trends(df, indicator_id, country_region_map, min_countries=
             n_countries=("country_iso3", "nunique"),
             n_obs=("value", "count")
         ).reset_index()
-        yearly = yearly[yearly["n_countries"] >= min_countries]
+        yearly = yearly[yearly["n_countries"] >= min_countries].sort_values("year")
+        if rolling_window > 0 and len(yearly) >= rolling_window:
+            yearly["median"] = yearly["median"].rolling(rolling_window, center=True, min_periods=1).median()
+        region_key = REGION_NAME_NORMALIZE.get(region, region)
         if len(yearly) > 0:
-            result[region] = [
+            result[region_key] = [
                 {"year": int(row["year"]), "median": round(float(row["median"]), 2),
                  "count": int(row["n_obs"]), "nCountries": int(row["n_countries"])}
                 for _, row in yearly.iterrows()
@@ -195,7 +241,9 @@ def compute_regional_trends(df, indicator_id, country_region_map, min_countries=
         median=("value", "median"),
         n_countries=("country_iso3", "nunique")
     ).reset_index()
-    global_yearly = global_yearly[global_yearly["n_countries"] >= 3]
+    global_yearly = global_yearly[global_yearly["n_countries"] >= 3].sort_values("year")
+    if rolling_window > 0 and len(global_yearly) >= rolling_window:
+        global_yearly["median"] = global_yearly["median"].rolling(rolling_window, center=True, min_periods=1).median()
     if len(global_yearly) > 0:
         result["Global"] = [
             {"year": int(row["year"]), "median": round(float(row["median"]), 2),
@@ -296,47 +344,64 @@ def main():
     country_region_map = load_country_region_mapping()
     print(f"  {len(country_region_map)} countries mapped to regions")
 
-    # Load both data sources
+    # Load all three data sources
     print("\nLoading data sources...")
     reg_df = load_regulators_db()
     ibnet_df = load_ibnet_backup()
+    new_ibnet_df = load_new_ibnet()
 
-    # Combine: regulators DB is primary, IBNET fills gaps
+    # Combine: regulators DB > NewIBNET > old IBNET (priority order for dedup)
     # Tag regulators data
     reg_subset = reg_df[reg_df["indicator_id"].isin(["OPS_NRW_PCT", "OPS_METERING_PCT", "FIN_COST_COVERAGE"])].copy()
     reg_subset["source"] = "regulators"
 
-    # For each (country, year, indicator), prefer regulators data over IBNET
-    # Remove IBNET records for country-year-indicator combos that exist in regulators
+    # Build priority keys: regulators first
     reg_keys = set(zip(reg_subset["country_iso3"], reg_subset["year"].astype(int), reg_subset["indicator_id"]))
-    ibnet_before = len(ibnet_df)
-    ibnet_filtered = ibnet_df[~ibnet_df.apply(
+
+    # Dedup NewIBNET against regulators
+    new_ibnet_before = len(new_ibnet_df)
+    new_ibnet_filtered = new_ibnet_df[~new_ibnet_df.apply(
         lambda r: (r["country_iso3"], int(r["year"]) if pd.notna(r["year"]) else 0, r["indicator_id"]) in reg_keys,
         axis=1
     )]
-    ibnet_dropped = ibnet_before - len(ibnet_filtered)
-    print(f"  IBNET dedup: {ibnet_dropped:,} records dropped (overlap with regulators DB), {len(ibnet_filtered):,} kept")
+    print(f"  NewIBNET dedup: {new_ibnet_before - len(new_ibnet_filtered):,} dropped (overlap with regulators), {len(new_ibnet_filtered):,} kept")
 
-    combined = pd.concat([reg_subset[["country_iso3", "year", "value", "indicator_id", "source"]],
-                          ibnet_filtered[["country_iso3", "year", "value", "indicator_id", "source"]]],
+    # Build combined priority keys (regulators + NewIBNET)
+    combined_keys = reg_keys.copy()
+    for _, r in new_ibnet_filtered.iterrows():
+        if pd.notna(r["year"]):
+            combined_keys.add((r["country_iso3"], int(r["year"]), r["indicator_id"]))
+
+    # Dedup old IBNET against regulators + NewIBNET
+    ibnet_before = len(ibnet_df)
+    ibnet_filtered = ibnet_df[~ibnet_df.apply(
+        lambda r: (r["country_iso3"], int(r["year"]) if pd.notna(r["year"]) else 0, r["indicator_id"]) in combined_keys,
+        axis=1
+    )]
+    ibnet_dropped = ibnet_before - len(ibnet_filtered)
+    print(f"  Old IBNET dedup: {ibnet_dropped:,} dropped (overlap with regulators + NewIBNET), {len(ibnet_filtered):,} kept")
+
+    cols = ["country_iso3", "year", "value", "indicator_id", "source"]
+    combined = pd.concat([reg_subset[cols], new_ibnet_filtered[cols], ibnet_filtered[cols]],
                          ignore_index=True)
 
     print(f"\nCombined dataset: {len(combined):,} records")
     for ind in ["OPS_NRW_PCT", "OPS_METERING_PCT", "FIN_COST_COVERAGE"]:
         sub = combined[combined["indicator_id"] == ind]
         n_reg = len(sub[sub["source"] == "regulators"])
+        n_new = len(sub[sub["source"] == "new_ibnet"])
         n_ibnet = len(sub[sub["source"] == "ibnet"])
         n_countries = sub["country_iso3"].nunique()
-        print(f"  {ind}: {n_reg:,} regulators + {n_ibnet:,} IBNET = {len(sub):,} total ({n_countries} countries)")
+        print(f"  {ind}: {n_reg:,} regulators + {n_new:,} NewIBNET + {n_ibnet:,} old IBNET = {len(sub):,} total ({n_countries} countries)")
 
     # Generate trends
-    for indicator, filename, label in [
-        ("OPS_NRW_PCT", "nrw_trends.json", "NRW Trends"),
-        ("OPS_METERING_PCT", "metering_trends.json", "Metering Trends"),
-        ("FIN_COST_COVERAGE", "cost_coverage_trends.json", "Cost Coverage Trends"),
+    for indicator, filename, label, rw in [
+        ("OPS_NRW_PCT", "nrw_trends.json", "NRW Trends", 3),
+        ("OPS_METERING_PCT", "metering_trends.json", "Metering Trends", 0),
+        ("FIN_COST_COVERAGE", "cost_coverage_trends.json", "Cost Coverage Trends", 0),
     ]:
         print(f"\n--- {label} ---")
-        trends = compute_regional_trends(combined, indicator, country_region_map)
+        trends = compute_regional_trends(combined, indicator, country_region_map, rolling_window=rw)
         for region, data in sorted(trends.items()):
             years = [d["year"] for d in data]
             print(f"  {region}: {min(years)}-{max(years)}, {len(data)} years")
